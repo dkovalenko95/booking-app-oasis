@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import Header from '../Header/Header';
-import { StyledRootLayout, Main } from './RootLayout.styled';
+import { StyledRootLayout, Main, Container } from './RootLayout.styled';
 
 function RootLayout() {
   return (
@@ -9,7 +9,9 @@ function RootLayout() {
       <Header />
       <Sidebar />
       <Main>
-        <Outlet />
+        <Container>
+          <Outlet />
+        </Container>
       </Main>
     </StyledRootLayout>
   );
