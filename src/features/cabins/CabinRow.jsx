@@ -1,10 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { formatCurrency } from '../../utils/helpers';
 import styled from 'styled-components';
-import { deleteCabin } from '../../services/apiCabins';
-import toast from 'react-hot-toast';
-import { useState } from 'react';
 import CreateCabinForm from './CreateCabinForm';
+import { useDeleteCabin } from './hooks/useDeleteCabin';
 
 const TableRow = styled.div`
   display: grid;
@@ -50,22 +48,8 @@ function CabinRow({ cabin }) {
 
   const [showForm, setShowForm] = useState(false);
 
-  const queryClient = useQueryClient();
-
   // Delete cabin
-  const { mutate, isPending, isSuccess } = useMutation({
-    mutationFn: deleteCabin,
-
-    onSuccess: () => {
-      toast.success('Cabin successfully deleted');
-
-      queryClient.invalidateQueries({
-        queryKey: ['cabins'],
-      }); // allow to mark queries as stale and potentially refetch data
-    }, // called after successful mutation
-
-    onError: (error) => toast.error(error.message), // err from muatation func deleteCabin
-  });
+  const { deleteCabin, isDeleting } = useDeleteCabin();
 
   return (
     <>
@@ -77,7 +61,7 @@ function CabinRow({ cabin }) {
         {discount ? <Discount>{formatCurrency(discount)}</Discount> : <span style={{ textAlign: 'center' }}>&mdash;</span>}
         <div>
           <button onClick={() => setShowForm((prevShow) => !prevShow)}>{!showForm ? 'Edit' : 'Cancel Edit'}</button>
-          <button onClick={() => mutate(cabinId)} disabled={isPending || isSuccess}>Delete</button>
+          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>Delete</button>
         </div>
       </TableRow>
       {showForm && <CreateCabinForm setShowForm={setShowForm} cabinToEdit={cabin} />}
@@ -86,3 +70,22 @@ function CabinRow({ cabin }) {
 }
 
 export default CabinRow;
+
+
+
+// EXTRACTED IN HOOK
+// const queryClient = useQueryClient();
+// // Delete cabin
+// const { mutate, isPending, isSuccess } = useMutation({
+//   mutationFn: deleteCabin,
+
+//   onSuccess: () => {
+//     toast.success('Cabin successfully deleted');
+
+//     queryClient.invalidateQueries({
+//       queryKey: ['cabins'],
+//     }); // allow to mark queries as stale and potentially refetch data
+//   }, // called after successful mutation
+
+//   onError: (error) => toast.error(error.message), // err from muatation func deleteCabin
+// });
