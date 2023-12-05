@@ -3,6 +3,8 @@ import { formatCurrency } from '../../utils/helpers';
 import styled from 'styled-components';
 import { deleteCabin } from '../../services/apiCabins';
 import toast from 'react-hot-toast';
+import { useState } from 'react';
+import CreateCabinForm from './CreateCabinForm';
 
 const TableRow = styled.div`
   display: grid;
@@ -46,8 +48,11 @@ const Discount = styled.div`
 function CabinRow({ cabin }) {
   const { id: cabinId, name, maxCapacity, regularPrice, discount, image } = cabin;
 
+  const [showForm, setShowForm] = useState(false);
+
   const queryClient = useQueryClient();
 
+  // Delete cabin
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: deleteCabin,
 
@@ -56,7 +61,7 @@ function CabinRow({ cabin }) {
 
       queryClient.invalidateQueries({
         queryKey: ['cabins'],
-      });
+      }); // allow to mark queries as stale and potentially refetch data
     }, // called after successful mutation
 
     onError: (error) => toast.error(error.message), // err from muatation func deleteCabin
@@ -69,9 +74,13 @@ function CabinRow({ cabin }) {
         <Cabin>{name}</Cabin>
         <div>Fits up to {maxCapacity} guests</div>
         <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{formatCurrency(discount)}</Discount>
-        <button onClick={() => mutate(cabinId)} disabled={isPending || isSuccess}>Delete</button>
+        {discount ? <Discount>{formatCurrency(discount)}</Discount> : <span style={{ textAlign: 'center' }}>&mdash;</span>}
+        <div>
+          <button onClick={() => setShowForm((prevShow) => !prevShow)}>{!showForm ? 'Edit' : 'Cancel Edit'}</button>
+          <button onClick={() => mutate(cabinId)} disabled={isPending || isSuccess}>Delete</button>
+        </div>
       </TableRow>
+      {showForm && <CreateCabinForm setShowForm={setShowForm} cabinToEdit={cabin} />}
     </>
   );
 }

@@ -17,8 +17,8 @@ function Cabins() {
       <Row>
         <CabinTable />
 
-        <Button onClick={() => setShowForm((prevShow) => !prevShow)}>Add new cabin</Button>
-        {showForm && <CreateCabinForm />}
+        {showForm && <CreateCabinForm setShowForm={setShowForm} />}
+        <Button onClick={() => setShowForm((prevShow) => !prevShow)}>{!showForm ? 'Add new cabin' : 'Cancel'}</Button>
       </Row>
     </>
   );
