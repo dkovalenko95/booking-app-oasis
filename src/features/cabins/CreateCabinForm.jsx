@@ -1,17 +1,15 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import Textarea from '../../ui/Textarea';
 import FormRow from '../../ui/FormRow';
-import { createEditCabin } from '../../services/apiCabins';
+import { useCreateCabin } from './hooks/useCreateCabin';
+import { useEditCabin } from './hooks/useEditCabin';
 
 function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
   const { id: editId, ...editValues } = cabinToEdit;
-  const queryClient = useQueryClient();
 
   // CREATE/EDIT MODE
   const isEditSession = Boolean(editId); // indicate edit/create mode for form
@@ -25,36 +23,12 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
     });
   const { errors } = formState;
 
-  // TODO: Apply DRY for 2 func below
-  // Create cabin
-  const { mutate: createCabin, isPending: isCreating } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success('Cabin successfuly created');
-      queryClient.invalidateQueries({
-        queryKey: ['cabins'],
-      });
-      reset();
-    },
-    onError: (error) => toast.error(error.message),
-  });
-
-  // Edit cabin
-  const { mutate: editCabin, isPending: isEditing } = useMutation({
-    mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success('Cabin successfuly edited');
-      queryClient.invalidateQueries({
-        queryKey: ['cabins'],
-      });
-      reset();
-    },
-    onError: (error) => toast.error(error.message),
-  });
-
+  // Custom hooks - create/edit
+  const { createCabin, isCreating } = useCreateCabin();
+  const { editCabin, isEditing } = useEditCabin();
   const isProcessing = isCreating || isEditing;
 
-  // 'data' gets from all field that registered
+  // Form 'data' gets from all field that registered
   function onSubmit(data) {
     console.log(data);
 
@@ -67,18 +41,37 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
           image: imageType
         },
         id: editId
+      }, {
+        onSuccess: (data) => {
+          console.log(data);
+          reset();
+        },
       });
     else 
+      // This createCabin()(mutate func) comes from RQuery(result of useMutation -> useCreateCabin hook) 
       createCabin({
-      ...data,
-      image: imageType
-    });
+        ...data,
+        image: imageType
+      }, {
+        onSuccess: (data) => {
+          console.log(data);
+          reset();
+        },
+      });
+    // Form reset() with RQuery
+    // Use onSuccess() handler not only on useMutation()(look at useCreateCabin.js)
+    // -> but also right where mutation happens
+    // -> use onSuccess() handler right here in the mutation func which in this case - createCabin() 
+    // -> need to pass in an obj{} of options(as 2nd arg)
+    // -> call onSuccess() -> reset()
+    // -> this call back 'onSuccess: (data) => {...' gets access to 'data' that the mutation func returns
+    // -> get access to 'new cabin data'(for newly reated/edited cabin) that returned from createEditCabin()(in apiCabins.js)
 
     setShowForm(false);
   };
 
   function onError(errors) {
-    console.log(errors);
+    console.log(errors); // inputs validation errors
   };
 
   return (
@@ -186,3 +179,34 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
 }
 
 export default CreateCabinForm;
+
+
+
+// EXTRACTED IN HOOK
+// TODO: Apply DRY for 2 func below
+// Create cabin
+// const { mutate: createCabin, isPending: isCreating } = useMutation({
+//   mutationFn: createEditCabin,
+//   onSuccess: () => {
+//     toast.success('Cabin successfuly created');
+//     queryClient.invalidateQueries({
+//       queryKey: ['cabins'],
+//     });
+//     reset();
+//   },
+//   onError: (error) => toast.error(error.message),
+// });
+
+// EXTRACTED IN HOOK
+  // Edit cabin
+  // const { mutate: editCabin, isPending: isEditing } = useMutation({
+  //   mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
+  //   onSuccess: () => {
+  //     toast.success('Cabin successfuly edited');
+  //     queryClient.invalidateQueries({
+  //       queryKey: ['cabins'],
+  //     });
+  //     reset();
+  //   },
+  //   onError: (error) => toast.error(error.message),
+  // });
