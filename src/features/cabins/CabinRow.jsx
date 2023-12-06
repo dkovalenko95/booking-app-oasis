@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
 import { formatCurrency } from '../../utils/helpers';
 import styled from 'styled-components';
 import CreateCabinForm from './CreateCabinForm';
 import { useDeleteCabin } from './hooks/useDeleteCabin';
+import { useCreateCabin } from './hooks/useCreateCabin';
 
 const TableRow = styled.div`
   display: grid;
@@ -44,9 +46,23 @@ const Discount = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const { id: cabinId, name, maxCapacity, regularPrice, discount, image } = cabin;
+  const { id: cabinId, name, maxCapacity, regularPrice, discount, description, image } = cabin;
 
   const [showForm, setShowForm] = useState(false);
+
+  // Duplicate cabin
+  const { createCabin, isCreating } = useCreateCabin();
+
+  const duplicateHandler = () => {
+    createCabin({
+      name: `Copy of ${name}`,
+      maxCapacity,
+      regularPrice,
+      discount,
+      description,
+      image,
+    })
+  }
 
   // Delete cabin
   const { deleteCabin, isDeleting } = useDeleteCabin();
@@ -60,8 +76,16 @@ function CabinRow({ cabin }) {
         <Price>{formatCurrency(regularPrice)}</Price>
         {discount ? <Discount>{formatCurrency(discount)}</Discount> : <span style={{ textAlign: 'center' }}>&mdash;</span>}
         <div>
-          <button onClick={() => setShowForm((prevShow) => !prevShow)}>{!showForm ? 'Edit' : 'Cancel Edit'}</button>
-          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>Delete</button>
+          {/* <button onClick={() => setShowForm((prevShow) => !prevShow)}>{!showForm ? 'Edit' : 'Cancel Edit'}</button> */}
+          <button onClick={duplicateHandler} disabled={isCreating}>
+            <HiSquare2Stack />
+          </button>
+          <button onClick={() => setShowForm((prevShow) => !prevShow)}>
+            <HiPencil />
+          </button>
+          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
+            <HiTrash />
+          </button>
         </div>
       </TableRow>
       {showForm && <CreateCabinForm setShowForm={setShowForm} cabinToEdit={cabin} />}
