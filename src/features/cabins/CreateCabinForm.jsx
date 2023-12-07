@@ -45,6 +45,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         onSuccess: (data) => {
           console.log(data);
           reset();
+          onCloseModal?.();
         },
       });
     else 
@@ -56,6 +57,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         onSuccess: (data) => {
           console.log(data);
           reset();
+          onCloseModal?.();
         },
       });
     // Form reset() with RQuery
@@ -66,8 +68,6 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
     // -> call onSuccess() -> reset()
     // -> this call back 'onSuccess: (data) => {...' gets access to 'data' that the mutation func returns
     // -> get access to 'new cabin data'(for newly reated/edited cabin) that returned from createEditCabin()(in apiCabins.js)
-
-    onCloseModal?.();
   };
 
   function onError(errors) {
@@ -75,7 +75,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModal ? 'modal' : 'type'}>
+    <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModal ? 'modal' : 'regular'}>
 
       <FormRow label='Cabin name' error={errors?.name?.message}>
         <Input

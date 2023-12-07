@@ -6,7 +6,8 @@ import supabase, { supabaseUrl } from './supabase';
 export async function getCabins() {
   const { data, error } = await supabase
     .from('Cabins')
-    .select('*');
+    .select('*')
+    .order('created_at', { ascending: true })
 
   if (error) {
     console.error(error);
@@ -43,7 +44,6 @@ export async function createEditCabin(cabinData, id) {
   const { data, error } = await query
     .select()
     .single() // return data as a single object instead of an array of objects
-    .order('created_at', { ascending: true }); // allow to retain the position in the table
 
   if (error) {
     console.error(error);
