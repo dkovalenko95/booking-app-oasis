@@ -74,7 +74,7 @@ function CabinRow({ cabin }) {
         <Cabin>{name}</Cabin>
         <div>Fits up to {maxCapacity} guests</div>
         <Price>{formatCurrency(regularPrice)}</Price>
-        {discount ? <Discount>{formatCurrency(discount)}</Discount> : <span style={{ textAlign: 'center' }}>&mdash;</span>}
+        {discount ? <Discount>{formatCurrency(discount)}</Discount> : <span>&mdash;</span>}
         <div>
           {/* <button onClick={() => setShowForm((prevShow) => !prevShow)}>{!showForm ? 'Edit' : 'Cancel Edit'}</button> */}
           <button onClick={duplicateHandler} disabled={isCreating}>
