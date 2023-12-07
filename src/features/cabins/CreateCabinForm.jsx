@@ -8,7 +8,7 @@ import FormRow from '../../ui/FormRow';
 import { useCreateCabin } from './hooks/useCreateCabin';
 import { useEditCabin } from './hooks/useEditCabin';
 
-function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = cabinToEdit;
 
   // CREATE/EDIT MODE
@@ -67,7 +67,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
     // -> this call back 'onSuccess: (data) => {...' gets access to 'data' that the mutation func returns
     // -> get access to 'new cabin data'(for newly reated/edited cabin) that returned from createEditCabin()(in apiCabins.js)
 
-    setShowForm(false);
+    onCloseModal?.();
   };
 
   function onError(errors) {
@@ -75,7 +75,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModal ? 'modal' : 'type'}>
 
       <FormRow label='Cabin name' error={errors?.name?.message}>
         <Input
@@ -165,6 +165,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm }) {
           $variation='secondary'
           type='reset'
           disabled={isProcessing}
+          onClick={() => onCloseModal?.()} // conditional call with optional chaining
         >
           Cancel
         </Button>
