@@ -21,8 +21,6 @@ const StyledConfirmDelete = styled.div`
 `;
 
 function ConfirmDelete({ resource, onConfirm, disabled, closeModal }) {
-  function handleConfirmClick() {}
-
   return (
     <StyledConfirmDelete>
       <Heading type='h3'>Delete {resource}</Heading>
@@ -32,12 +30,12 @@ function ConfirmDelete({ resource, onConfirm, disabled, closeModal }) {
       </p>
 
       <div>
-        <Button variation='secondary' onClick={closeModal}>
+        <Button $variation='secondary' onClick={closeModal}>
           Cancel
         </Button>
         <Button
-          variation='danger'
-          onClick={handleConfirmClick}
+          $variation='danger'
+          onClick={onConfirm}
           disabled={disabled}
         >
           Delete
@@ -48,3 +46,6 @@ function ConfirmDelete({ resource, onConfirm, disabled, closeModal }) {
 }
 
 export default ConfirmDelete;
+
+// NOTE: About onCloseModal prop -> look at Modal.jsx - cloneElement in Window comp
+// Since this is a child component now of the modal window, it'll automatically receive the onClose modal prompt, right? So that's what we have been talking about all this time where, remember, we clone this element and inject that function in there. So, giving it this onClose modal prompt. And so now that will be created inside confirmDelete. So here we have now access to that. And so we can say onClick onCloseModal.
