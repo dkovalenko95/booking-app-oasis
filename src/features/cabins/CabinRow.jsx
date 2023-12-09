@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HiSquare2Stack, HiPencil, HiTrash } from 'react-icons/hi2';
+import { IoCloseOutline } from 'react-icons/io5';
 import { formatCurrency } from '../../utils/helpers';
 import styled from 'styled-components';
 import CreateCabinForm from './CreateCabinForm';
@@ -48,7 +49,7 @@ const Discount = styled.div`
 function CabinRow({ cabin }) {
   const { id: cabinId, name, maxCapacity, regularPrice, discount, description, image } = cabin;
 
-  const [showForm, setShowForm] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
 
   // Duplicate cabin
   const { createCabin, isCreating } = useCreateCabin();
@@ -80,15 +81,18 @@ function CabinRow({ cabin }) {
           <button onClick={duplicateHandler} disabled={isCreating}>
             <HiSquare2Stack />
           </button>
-          <button onClick={() => setShowForm((prevShow) => !prevShow)}>
-            <HiPencil />
+          <button onClick={() => setIsEditFormOpen((prev) => !prev)}>
+            {isEditFormOpen ? <IoCloseOutline /> : <HiPencil />}
           </button>
           <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
             <HiTrash />
           </button>
         </div>
       </TableRow>
-      {showForm && <CreateCabinForm setShowForm={setShowForm} cabinToEdit={cabin} />}
+
+
+
+      {isEditFormOpen && <CreateCabinForm setIsEditFormOpen={setIsEditFormOpen} cabinToEdit={cabin} />}
     </>
   );
 }
