@@ -8,7 +8,7 @@ import FormRow from '../../ui/FormRow';
 import { useCreateCabin } from './hooks/useCreateCabin';
 import { useEditCabin } from './hooks/useEditCabin';
 
-function CreateCabinForm({ cabinToEdit = {}, onCloseModal, setIsEditFormOpen }) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = cabinToEdit;
 
   // CREATE/EDIT MODE
@@ -45,9 +45,6 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal, setIsEditFormOpen }) 
         onSuccess: (data) => {
           console.log(data);
           reset();
-          if (isEditSession) {
-            setIsEditFormOpen(false);
-          }
           onCloseModal?.();
         },
       });
@@ -170,7 +167,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal, setIsEditFormOpen }) 
           disabled={isProcessing}
           onClick={() => onCloseModal?.()} // conditional call with optional chaining
         >
-          {isEditSession ? 'Reset' : 'Cancel'}
+          Cancel
         </Button>
         <Button
           disabled={isProcessing}
