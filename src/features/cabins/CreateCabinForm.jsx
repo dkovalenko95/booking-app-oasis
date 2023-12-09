@@ -170,7 +170,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal, setIsEditFormOpen }) 
           disabled={isProcessing}
           onClick={() => onCloseModal?.()} // conditional call with optional chaining
         >
-          Cancel
+          {isEditSession ? 'Reset' : 'Cancel'}
         </Button>
         <Button
           disabled={isProcessing}
