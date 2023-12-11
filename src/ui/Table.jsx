@@ -10,7 +10,7 @@ const StyledTable = styled.div`
   overflow: hidden;
 `;
 
-const CommonRow = styled.header`
+const CommonRow = styled.div`
   display: grid;
   grid-template-columns: ${(props) => props.$columns};
   column-gap: 2.4rem;
@@ -74,9 +74,8 @@ function Table({ columns, children }) {
 
 function Header({ children }) {
   const { columns } = useContext(TableContext);
-  console.log(columns);
   return (
-    <StyledHeader role='row' $columns={columns}>
+    <StyledHeader role='row' $columns={columns} as='header'>
       { children }
     </StyledHeader>
   );
@@ -84,19 +83,20 @@ function Header({ children }) {
 
 function Row({ children }) {
   const { columns } = useContext(TableContext);
-  console.log(columns);
   return (
-    <StyledRow role='row' $columns={columns} as='div'>
+    <StyledRow role='row' $columns={columns}>
       { children }
     </StyledRow>
   );
 }
 
 function Body({ data, render }) {
+  // Guard clause
+  if (!data.length) return <Empty>No data available at the moment</Empty>;
   return (
-    <>
-
-    </>
+    <StyledBody>
+      {data.map(render)}
+    </StyledBody>
   );
 }
 
