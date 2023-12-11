@@ -1,3 +1,4 @@
+import { createContext, useContext } from 'react';
 import styled from 'styled-components';
 
 const StyledTable = styled.div`
@@ -11,7 +12,7 @@ const StyledTable = styled.div`
 
 const CommonRow = styled.header`
   display: grid;
-  grid-template-columns: ${(props) => props.columns};
+  grid-template-columns: ${(props) => props.$columns};
   column-gap: 2.4rem;
   align-items: center;
   transition: none;
@@ -57,3 +58,52 @@ const Empty = styled.p`
   text-align: center;
   margin: 2.4rem;
 `;
+
+// Compound components pattern
+const TableContext = createContext();
+
+function Table({ columns, children }) {
+  return (
+    <TableContext.Provider value={{ columns }}>
+      <StyledTable role='table'>
+        { children }
+      </StyledTable>
+    </TableContext.Provider>
+  );
+}
+
+function Header({ children }) {
+  const { columns } = useContext(TableContext);
+  console.log(columns);
+  return (
+    <StyledHeader role='row' $columns={columns}>
+      { children }
+    </StyledHeader>
+  );
+}
+
+function Row({ children }) {
+  const { columns } = useContext(TableContext);
+  console.log(columns);
+  return (
+    <StyledRow role='row' $columns={columns} as='div'>
+      { children }
+    </StyledRow>
+  );
+}
+
+function Body({ data, render }) {
+  return (
+    <>
+
+    </>
+  );
+}
+
+Table.Header = Header;
+Table.Row = Row;
+Table.Body = Body;
+Table.Footer = Footer;
+
+export default Table;
+
