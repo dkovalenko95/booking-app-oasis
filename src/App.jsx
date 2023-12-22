@@ -5,11 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
+// Init React Query - used to interact with a cache
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // staleTime: 60 * 1000,
-      staleTime: 3 * 1000,
+      staleTime: 3 * 1000, // amount of time the data in the cache will stay fresh(so that it will stay valid until it is refetched again)
     }
   }
 });

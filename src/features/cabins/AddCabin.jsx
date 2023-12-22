@@ -3,7 +3,6 @@ import CreateCabinForm from './CreateCabinForm';
 import Modal from '../../ui/Modal';
 
 function AddCabin() {
-
   return (
     <div>
       <Modal>
@@ -21,12 +20,16 @@ function AddCabin() {
 
 export default AddCabin;
 
+
+
+// NOTE: AddCabin before Compound Pattern applied to Modal
 // function AddCabin() {
 //   const [isOpenModal, setIsOpenModal] = useState(false);
-
 //   return (
 //     <>
-//       <Button onClick={() => setIsOpenModal((prevShow) => !prevShow)}>{!isOpenModal ? 'Add new cabin' : 'Cancel'}</Button>
+//       <Button onClick={() => setIsOpenModal((prevShow) => !prevShow)}>
+//         {!isOpenModal ? 'Add new cabin' : 'Cancel'}
+//       </Button>
 //       {isOpenModal &&
 //         <Modal onClose={() => setIsOpenModal(false)}>
 //           <CreateCabinForm onCloseModal={() => setIsOpenModal(false)} />

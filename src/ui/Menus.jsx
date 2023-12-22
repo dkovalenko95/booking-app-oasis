@@ -134,7 +134,7 @@ function List({ id, children }) {
   );
 }
 
-function Button({ children, icon, onClick }) {
+function Button({ children, icon, onClick, isProcessing }) {
   const { close } = useContext(MenusContext);
   
   const clickHandler = () => {
@@ -144,7 +144,7 @@ function Button({ children, icon, onClick }) {
 
   return (
     <li>
-      <StyledButton onClick={clickHandler}>
+      <StyledButton onClick={clickHandler} disabled={isProcessing}>
         {icon}<span>{ children }</span>
       </StyledButton>
     </li>

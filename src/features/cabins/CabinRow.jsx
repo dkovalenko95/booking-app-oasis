@@ -70,7 +70,7 @@ function CabinRow({ cabin }) {
             <Menus.Toggle id={cabinId} />
 
             <Menus.List id={cabinId}>
-              <Menus.Button icon={<HiSquare2Stack />} onClick={duplicateHandler}>
+              <Menus.Button icon={<HiSquare2Stack />} onClick={duplicateHandler} isProcessing={isCreating}>
                 Duplicate
               </Menus.Button>
 
@@ -84,12 +84,12 @@ function CabinRow({ cabin }) {
             </Menus.List>
 
             <Modal.Window name='edit'>
-              <CreateCabinForm cabinToEdit={cabin} />
+              <CreateCabinForm cabinToEdit={cabin} isProcessing={isCreating} />
             </Modal.Window>
 
             <Modal.Window name='delete'>
               <ConfirmDelete
-                resourceName='cabins'
+                resourceName={name}
                 disabled={isDeleting}
                 onConfirm={() => deleteCabin(cabinId)}
               />
@@ -98,7 +98,6 @@ function CabinRow({ cabin }) {
         </Modal>
       </div>
 
-      
     </Table.Row>
   );
 }
@@ -107,24 +106,22 @@ export default CabinRow;
 
 
 
-// EXTRACTED IN HOOK
+// NOTE: EXTRACTED IN HOOK
 // const queryClient = useQueryClient();
 // // Delete cabin
 // const { mutate, isPending, isSuccess } = useMutation({
 //   mutationFn: deleteCabin,
-
 //   onSuccess: () => {
 //     toast.success('Cabin successfully deleted');
-
 //     queryClient.invalidateQueries({
 //       queryKey: ['cabins'],
 //     }); // allow to mark queries as stale and potentially refetch data
 //   }, // called after successful mutation
-
 //   onError: (error) => toast.error(error.message), // err from muatation func deleteCabin
 // });
 
-// BEFORE COMPOUND PATTERN
+
+// NOTE: BEFORE COMPOUND PATTERN
 // const TableRow = styled.div`
 //   display: grid;
 //   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -138,39 +135,39 @@ export default CabinRow;
 // `;
 
 
-// COMPOUND PATTERN - before modal + menu
-{/* <div>
-  <button onClick={duplicateHandler} disabled={isCreating}>
-    <HiSquare2Stack />
-  </button>
+// NOTE: COMPOUND PATTERN - before Modal + Menu
+// <div>
+//   <button onClick={duplicateHandler} disabled={isCreating}>
+//     <HiSquare2Stack />
+//   </button>
 
-  <Modal>
-    <Modal.Open opens='edit'>
-      <button>
-        <HiPencil />
-      </button>
-    </Modal.Open>
-    <Modal.Window name='edit'>
-      <CreateCabinForm cabinToEdit={cabin} />
-    </Modal.Window>
+//   <Modal>
+//     <Modal.Open opens='edit'>
+//       <button>
+//         <HiPencil />
+//       </button>
+//     </Modal.Open>
+//     <Modal.Window name='edit'>
+//       <CreateCabinForm cabinToEdit={cabin} />
+//     </Modal.Window>
 
-    <Modal.Open opens='delete'>
-      <button>
-        <HiTrash />
-      </button>
-    </Modal.Open>
-    <Modal.Window name='delete'>
-      <ConfirmDelete resource='cabins' disabled={isDeleting} onConfirm={() => deleteCabin(cabinId)} />
-    </Modal.Window>
-  </Modal>
+//     <Modal.Open opens='delete'>
+//       <button>
+//         <HiTrash />
+//       </button>
+//     </Modal.Open>
+//     <Modal.Window name='delete'>
+//       <ConfirmDelete resource='cabins' disabled={isDeleting} onConfirm={() => deleteCabin(cabinId)} />
+//     </Modal.Window>
+//   </Modal>
 
-  <Menus.Menu>
-    <Menus.Toggle id={cabinId} />
+//   <Menus.Menu>
+//     <Menus.Toggle id={cabinId} />
 
-    <Menus.List id={cabinId}>
-      <Menus.Button icon={<HiSquare2Stack />} onClick={duplicateHandler}>Duplicate</Menus.Button>
-      <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
-      <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-    </Menus.List>
-  </Menus.Menu>
-</div> */}
+//     <Menus.List id={cabinId}>
+//       <Menus.Button icon={<HiSquare2Stack />} onClick={duplicateHandler}>Duplicate</Menus.Button>
+//       <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+//       <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+//     </Menus.List>
+//   </Menus.Menu>
+// </div>

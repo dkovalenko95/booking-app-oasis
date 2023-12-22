@@ -30,8 +30,6 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
 
   // Form 'data' gets from all field that registered
   function onSubmit(data) {
-    console.log(data);
-
     const imageType = typeof data.image === 'string' ? data.image : data?.image[0]; // CREATE - image new 'object' || EDIT - image existed 'string' url from Supabase 
 
     if (isEditSession)
@@ -43,7 +41,6 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         id: editId
       }, {
         onSuccess: (data) => {
-          console.log(data);
           reset();
           onCloseModal?.();
         },
@@ -55,7 +52,6 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         image: imageType
       }, {
         onSuccess: (data) => {
-          console.log(data);
           reset();
           onCloseModal?.();
         },
@@ -70,12 +66,13 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
     // -> get access to 'new cabin data'(for newly reated/edited cabin) that returned from createEditCabin()(in apiCabins.js)
   };
 
-  function onError(errors) {
-    console.log(errors); // inputs validation errors
-  };
+  // Unnecessary code for demostration
+  // function onError(errors) {
+  //   console.log(errors); // inputs validation errors
+  // };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModal ? 'modal' : 'regular'}>
+    <Form onSubmit={handleSubmit(onSubmit, /* onError */)} type={onCloseModal ? 'modal' : 'regular'}>
 
       <FormRow label='Cabin name' error={errors?.name?.message}>
         <Input
@@ -183,8 +180,7 @@ export default CreateCabinForm;
 
 
 
-// EXTRACTED IN HOOK
-// TODO: Apply DRY for 2 func below
+// NOTE: EXTRACTED IN HOOK
 // Create cabin
 // const { mutate: createCabin, isPending: isCreating } = useMutation({
 //   mutationFn: createEditCabin,
@@ -198,16 +194,16 @@ export default CreateCabinForm;
 //   onError: (error) => toast.error(error.message),
 // });
 
-// EXTRACTED IN HOOK
-  // Edit cabin
-  // const { mutate: editCabin, isPending: isEditing } = useMutation({
-  //   mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
-  //   onSuccess: () => {
-  //     toast.success('Cabin successfuly edited');
-  //     queryClient.invalidateQueries({
-  //       queryKey: ['cabins'],
-  //     });
-  //     reset();
-  //   },
-  //   onError: (error) => toast.error(error.message),
-  // });
+// NOTE: EXTRACTED IN HOOK
+// Edit cabin
+// const { mutate: editCabin, isPending: isEditing } = useMutation({
+//   mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
+//   onSuccess: () => {
+//     toast.success('Cabin successfuly edited');
+//     queryClient.invalidateQueries({
+//       queryKey: ['cabins'],
+//     });
+//     reset();
+//   },
+//   onError: (error) => toast.error(error.message),
+// });

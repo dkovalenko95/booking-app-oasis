@@ -75,16 +75,15 @@ function Open({ children, opens: opensWindowName }) {
 
   return (
     // { children }
-    cloneElement(children, { onClick: () => open(opensWindowName) }) // used for internal access to event handler -> check docs
+    cloneElement(children, { onClick: () => open(opensWindowName) }) // cloneElement() used for internal access to event handler(here need to add 'onClick={open(name)}' for elem sets as 'children') -> in this case <Button /> from AddCabin.jsx -> check docs for more info
   );
 };
 
-function Window({ children, name  }) {
+function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
   
-  // Add global event listeners for the click event (primitive DOM manipulation)
+  // Add global event listener for the click(primitive DOM manipulation)
   const { ref } = useOutsideClick(close);
-  
   if (name !== openName) return null;
 
   return createPortal(
@@ -94,7 +93,6 @@ function Window({ children, name  }) {
           <HiXMark />
         </Button>
         <div>
-          {/* { children } */}
           {cloneElement(children, { onCloseModal: () => close() })}
         </div>
       </StyledModal>
@@ -109,6 +107,9 @@ Modal.Window = Window;
 
 export default Modal;
 
+
+
+// NOTE: Simple tempalte for Modal before compound
 // function Modal({ children, onClose }) {
 //   return createPortal(
 //     <Overlay>
@@ -126,19 +127,47 @@ export default Modal;
 //   );
 // }
 
-// EXTRACTED TO HOOK - outside click for modal closing
+
+// NOTE: EXTRACTED TO HOOK - outside click for modal closing
 // useEffect(() => {
 //   const clickHandler = (e) => {
 //     if (modalRef.current && !modalRef.current.contains(e.target)) {
 //       close();
 //     };
 //   };
-  
 //   document.addEventListener('click', clickHandler, true);
-
 //   // Cleanup
 //   return () => document.removeEventListener('click', clickHandler, true);
 // }, [close]);
 
-// NOTE: Event bubbling
-// All right, now, there's just one problem with this, because watch what happens as I click here again. So that's very strange, right? So we get click outside, but the window doesn't show up, so what strange thing is happening here? Well, the reason for this is actually the way that events work in JavaScript, and in particular, the fact that events bubble up. So whenever I click here on this button, the modal window will be attached to the DOM, right? And it will be attached right here as a direct child of the body, and so if I click on the button, that event will bubble up all the way through the DOM until it also reaches that modal window, and so then the click is basically detected outside the modal window, which will immediately close that window again, so our logic is actually working just fine. So again, when we click here, the modal window basically gets opened for a millisecond, but then it immediately detects a click outside of it, and so then it will immediately close again, and so the way that we fix this is to not listen for these events on the bubbling phase, but on the capturing phase, so basically, as the event moves down the DOM tree and not up the DOM tree, and if all of this sounds a bit strange, then this is just the way that events work in JavaScript, and I have a whole lecture about this in the section on how React works behind the scenes, so please go back there if this is strange to you, but in any case, we can change this default behavior by here, passing in a third argument, which is simply to set this to true. And so if we use true here, then again, the event will actually be handled in the capturing phase, so as the event moves down the tree. So then here the same thing, let's just reload here, let's click, and nice. So that solves our problem, and so that's the reason why I told you earlier that even though we left vanilla JavaScript behind, it's still very important to understand how many things work, because without that knowledge, you probably wouldn't have been able to solve this issue, and so that fundamental knowledge is still extremely important. So let's just test if the click outside still works, and it does, great. So this is how any modern modal window is supposed to work. And now, just to finish, let's actually extract all of this here into a custom hook, which is a great exercise, not only to practice your React skills, but also to create a very nice and reusable custom hook for you. So if you want, you can pause the video here and do this extraction yourself, and then I will come back here once you are finished with that. All right, so hopefully, you tried this, but in any case, let's create that new file right here in the reusable Hooks folder, and let's call it useOutsideClick.js, and then a function called useOutsideClick. Let's also export this, and then what we need to do is to basically just grab all the code here. So I will just copy it for now, paste that here, and then of course, we need to get everything in here. So what do we need inside this custom hook from the outside? Well, it's actually already marked in red, which is basically this handler function right here. So when we use this custom hook now in our component, we will need to pass in that function, and so let's actually delete this now and call useOutsideClick. And so again, here, we now need to pass in that handler, and so that handler is going to be that close function. And so here, let's receive that, and then of course, here, we just call it handler, 'cause this should become really generic. Then here, also, we need to use handler, and maybe to make this even a bit more flexible, let us here allow the user to specify whether they want to listen for the event in the bubbling or in the capturing phase. So let's call this one listenCapturing, and by default, let's set it to true, so then here, we will replace those with listenCapturing. Then we need that here like this, and now, let's see the problem that we have here, and yeah, the only thing that we are missing here is this ref, and so that means that this function here should probably return that ref. So let's store that here, and then all we need to do is to export that, so to return that actually from here, and with this, the same functionality should now be encapsulated here in this abstraction, so in that own custom hook right there. So let's see, and beautiful. Maybe just to finish, let's get rid of that console.log, and there we go, nice. And now, next up, let's also reuse this modal here for some other things. So this form right here, or actually, not this, but here, the edit form is still being rendered down here, and so let's also place that inside a modal window in the next lecture.
+
+// NOTE: cloneElement() alternatives
+// 1) Render Props Pattern
+// <Modal.Open
+//   opens='cabin-form'
+//   render={(open) => <Button onClick={open}>Add new Cabin</Button>}
+// >
+//   <Button>Add new cabin</Button>
+// </Modal.Open>
+
+// function Open({ render, opens: opensWindowName }) {
+//   const { open } = useContext(ModalContext);
+//   return render(() => open(opensWindowName));
+// };
+
+// 2) createElement()
+// function Open({ children, opens: opensWindowName }) {
+//   const { open } = useContext(ModalContext);
+//   return createElement(children.type, {
+//     ...children.props,
+//     onClick: () => open(opensWindowName),
+//   });
+// }
+
+
+// NOTE: Event bubbling/capturing - related to outside click -> useOutsideClick()
+// Whenever to click on 'Add Cabin' btn -> Modal will be attached to the DOM(as a direct child of the 'body'). 
+// Click on btn -> 'click' event will bubble up all the way through the DOM until it reaches that Modal -> so then 'click' is basically detected outside the Modal, which will immediately close that Modal again(so logic is working). 
+// So basically, when btn clicked -> Modal gets opened for a millisecond, but then it immediately detects 'click' outside of it(because of bubbling), and then it will immediately close again.
+// The way to fix this is to not listen for these events on the 'bubbling phase', but on the 'capturing phase', so basically, as the event moves down(capturing) the DOM tree and not up(bubbling) the DOM tree -> to change this default behavior need to pass in a 3rd argument as 'true' to 'addEventListener'.
+// If use 'true' here, the event will be handled in the 'capturing phase', so as the event moves down the tree. 

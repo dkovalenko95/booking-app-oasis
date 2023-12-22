@@ -38,13 +38,13 @@ export default CabinTable;
 
 
 
-// EXTRACTED IN HOOK
+// NOTE: EXTRACTED IN HOOK
 // const { isLoading, data: cabins, error } = useQuery({
 //   queryKey: ['cabins'],
 //   queryFn: getCabins,
 // });
 
-// BEFORE COMPOUND PATTERN
+// NOTE: BEFORE COMPOUND PATTERN
 // return (
 //   <Table role='table'>
 //     <TableHeader role='row'>
