@@ -51,6 +51,7 @@ function Filter({ filterField, options }) {
           key={option.value}
           onClick={() => clickHandler(option.value)}
           $active={option.value === currFilter}
+          disabled={option.value === currFilter}
         >
           {option.label}
         </FilterButton>  
