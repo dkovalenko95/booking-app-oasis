@@ -20,15 +20,19 @@ export function useFetchBookings() {
   const [field, direction] = sortByRawData.split('-');
   const sortBy = { field, direction };
 
-  const { isLoading, data: bookings, error } = useQuery({
+  // Pagination
+  const page = !searchParams.get('page') ? 1 : Number(searchParams.get('page'));
+
+  const { isLoading, data: { data: bookings, count } = {}, error } = useQuery({
     // Re-fetch data if filter applied -> add value that query should be depend on in arr below -> if dependency changes -> re-fetch + (can think about this arr ['bookings', filter, sortBy] in queryKey as dependency arr of useQuery())
-    queryKey: ['bookings', filter, sortBy],
-    queryFn: () => getBookings({ filter, sortBy }),
+    queryKey: ['bookings', filter, sortBy, page],
+    queryFn: () => getBookings({ filter, sortBy, page }),
   });
 
   return {
     isLoading,
     bookings,
+    count,
     error,
   };
 }
