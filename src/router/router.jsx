@@ -8,6 +8,7 @@ import Users from '../pages/Users';
 import Settings from '../pages/Settings';
 import Account from '../pages/Account';
 import Login from '../pages/Login';
+import Booking from '../pages/Booking';
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
       {
         path: '/bookings',
         element: <Bookings />,
+      },
+      {
+        path: '/bookings/:bookingId',
+        element: <Booking />,
       },
       {
         path: '/cabins',
