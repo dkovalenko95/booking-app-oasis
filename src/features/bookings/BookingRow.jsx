@@ -114,8 +114,7 @@ function BookingRow({
               Check out
             </Menus.Button>
           }
-
-          
+ 
         </Menus.List>
       </Menus.Menu>
     </Table.Row>

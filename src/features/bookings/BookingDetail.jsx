@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { HiArrowUpOnSquare } from 'react-icons/hi2';
 import styled from 'styled-components';
 import BookingDataBox from './BookingDataBox';
 import Row from '../../ui/Row';
@@ -13,6 +12,8 @@ import { useMoveBack } from '../../hooks/useMoveBack';
 import { useFetchBooking } from './hooks/useFetchBooking';
 import { useCheckout } from '../check-in-out/hooks/useCheckout';
 import { useDeleteBooking } from './hooks/useDeleteBooking';
+import Modal from '../../ui/Modal';
+import ConfirmDelete from '../../ui/ConfirmDelete';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -51,16 +52,26 @@ function BookingDetail() {
       <BookingDataBox booking={booking} />
 
       <ButtonGroup>
-        <Button
-          $variation='danger'
-          onClick={() => {
-            deleteBooking(bookingId);
-            navigate(`/bookings`);
-          }}
-          disabled={isDeletingBooking}
-        >
-          Delete
-        </Button>
+        <Modal>
+          <Modal.Open opens='deleteBooking'>
+            <Button
+              $variation='danger'
+            >
+              Delete
+            </Button>
+          </Modal.Open>
+
+          <Modal.Window name='deleteBooking'>
+            <ConfirmDelete
+              resourceName={`#${bookingId} booking`}
+              disabled={isDeletingBooking}
+              onConfirm={() => {
+                deleteBooking(bookingId);
+                navigate(`/bookings`);
+              }}
+            />
+          </Modal.Window>
+        </Modal>
 
         {status === 'unconfirmed' &&
           <Button
