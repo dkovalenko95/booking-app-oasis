@@ -41,7 +41,7 @@ function Filter({ filterField, options }) {
 
   const clickHandler = (value) => {
     searchParams.set(filterField, value);
-    searchParams.set('page', 1); // reset page query if filter applied
+    if (searchParams.get('page')) searchParams.set('page', 1); // reset page query if filter applied
     setSearchParams(searchParams);
   };
   
