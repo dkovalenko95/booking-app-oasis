@@ -5,7 +5,6 @@ import Table from '../../ui/Table';
 import Empty from '../../ui/Empty';
 import CabinRow from './CabinRow';
 import { useFetchCabins } from './hooks/useFetchCabins';
-import Pagination from '../../ui/Pagination';
 
 function CabinTable() {
   const { isLoading, cabins } = useFetchCabins();
@@ -54,10 +53,6 @@ function CabinTable() {
             <CabinRow cabin={cabin} key={cabin.id} />
             )}
         />
-
-        <Table.Footer>
-          <Pagination />
-        </Table.Footer>
       </Table>
     </Menus>
   );

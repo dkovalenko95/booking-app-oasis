@@ -12,6 +12,7 @@ import Spinner from '../../ui/Spinner';
 import { useMoveBack } from '../../hooks/useMoveBack';
 import { useFetchBooking } from './hooks/useFetchBooking';
 import { useCheckout } from '../check-in-out/hooks/useCheckout';
+import { useDeleteBooking } from './hooks/useDeleteBooking';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -25,6 +26,7 @@ function BookingDetail() {
 
   const { booking, isLoading } = useFetchBooking();
   const { checkout, isCheckingOut } = useCheckout();
+  const { deleteBooking, isDeletingBooking } = useDeleteBooking();
   
   if (isLoading) return <Spinner />
   
@@ -49,11 +51,38 @@ function BookingDetail() {
       <BookingDataBox booking={booking} />
 
       <ButtonGroup>
-        {status === 'unconfirmed' && <Button onClick={() => navigate(`/checkin/${bookingId}`)}>Check in</Button>}
+        <Button
+          $variation='danger'
+          onClick={() => {
+            deleteBooking(bookingId);
+            navigate(`/bookings`);
+          }}
+          disabled={isDeletingBooking}
+        >
+          Delete
+        </Button>
+
+        {status === 'unconfirmed' &&
+          <Button
+            onClick={() => navigate(`/checkin/${bookingId}`)}
+          >
+            Check in
+          </Button>
+        }
+
         {status === 'checked-in' &&
-            <Button icon={<HiArrowUpOnSquare />} onClick={() => checkout(bookingId)} disabled={isCheckingOut}>Check out</Button>
-          }
-        <Button $variation='secondary' onClick={moveBack}>
+          <Button
+            onClick={() => checkout(bookingId)}
+            disabled={isCheckingOut}
+          >
+            Check out
+          </Button>
+        }
+
+        <Button
+          $variation='secondary'
+          onClick={moveBack}
+        >
           Back
         </Button>
       </ButtonGroup>
