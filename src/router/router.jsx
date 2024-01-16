@@ -10,11 +10,18 @@ import Account from '../pages/Account';
 import Login from '../pages/Login';
 import Booking from '../pages/Booking';
 import Checkin from '../pages/Checkin';
+import ProtectedRoute from './ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <Login />,
+  },
+  {
     path: '/',
-    element: <RootLayout />,
+    element: <ProtectedRoute>
+      <RootLayout />
+    </ProtectedRoute>,
     errorElement: <PageNotFound />,
     children: [
       // {
@@ -55,9 +62,5 @@ export const router = createBrowserRouter([
         element: <Account />
       },
     ],
-  },
-  {
-    path: '/login',
-    element: <Login />,
   },
 ]);

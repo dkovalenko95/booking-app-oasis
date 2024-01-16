@@ -9,7 +9,7 @@ import { Toaster } from 'react-hot-toast';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 3 * 1000, // amount of time the data in the cache will stay fresh(so that it will stay valid until it is refetched again)
+      staleTime: 0, // amount of time the data in the cache will stay fresh(so that it will stay valid until it is refetched again)
     }
   }
 });
