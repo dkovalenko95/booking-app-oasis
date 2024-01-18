@@ -1,7 +1,9 @@
 import supabase from './supabase';
+import { supabaseSignUpTemp } from './supabaseSignUpTemp';
 
 export async function signup({ fullName, email, password }) {
-  const { data, error } = await supabase.auth.signUp({
+  // Using 2nd Supabase Client to allow current user register new one without current user session shutting-off
+  const { data, error } = await supabaseSignUpTemp.auth.signUp({
     email,
     password,
     options: {
@@ -17,6 +19,18 @@ export async function signup({ fullName, email, password }) {
   return {
     data,
   };
+};
+
+export async function tempSignUpSession() {
+  const { data: session } = await supabaseSignUpTemp.auth.getSession();
+  if (!session.session) return null;
+
+  return session.session;
+};
+
+export async function tempSignUpLogout() {
+  const { error } = await supabaseSignUpTemp.auth.signOut();
+  if (error) throw new Error(error.message);
 };
 
 export async function login({ email, password }) {

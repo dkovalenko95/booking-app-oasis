@@ -4,6 +4,8 @@ import GlobalStyles from './styles/GlobalStyles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
+import { useEffect } from 'react';
+import { tempSignUpLogout, tempSignUpSession } from './services/apiAuth';
 
 // Init React Query - used to interact with a cache
 const queryClient = new QueryClient({
@@ -15,6 +17,18 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Check for temp session logout after new user SignUp confirmation via email(check if it could be done with React Query)
+  useEffect(() => {
+    async function checkTempSignUpSession() {
+      const session = await tempSignUpSession();
+      if (!session) return null;
+      if (session) {
+        await tempSignUpLogout();
+      };
+    };
+    checkTempSignUpSession();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
