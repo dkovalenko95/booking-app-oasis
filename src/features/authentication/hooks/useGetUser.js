@@ -9,7 +9,7 @@ export function useGetUser() {
   });
   
   return {
-    // user,
+    user,
     isLoadingUser,
     fetchStatus,
     isAuthenticated: user?.role === 'authenticated',

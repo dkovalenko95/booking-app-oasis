@@ -1,9 +1,11 @@
-import Logout from '../../features/authentication/Logout';
+import HeaderMenu from '../../ui/HeaderMenu';
+import UserAvatar from '../../features/authentication/UserAvatar';
 import { StyledHeader } from './Header.styled';
 
 function Header() {
   return <StyledHeader>
-    <Logout />
+    <UserAvatar />
+    <HeaderMenu />
   </StyledHeader>;
 }
 
