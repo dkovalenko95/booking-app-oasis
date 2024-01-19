@@ -13,7 +13,7 @@ export function useUpdateUser() {
       queryClient.invalidateQueries({ queryKey: ['user'] });
 
       // Manual cache update, 'user' should come from: 'onSuccess: ({ user }) => {...' (in case it could be useful)
-      // queryClient.setQueryData('user', data.user);
+      // queryClient.setQueryData(['user'], data.user);
     },
 
     onError: (error) => {
