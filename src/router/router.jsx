@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import RootLayout from '../layout/RootLayout/RootLayout';
 import PageNotFound from '../pages/PageNotFound';
 import Dashboard from '../pages/Dashboard';
@@ -24,12 +25,11 @@ export const router = createBrowserRouter([
     </ProtectedRoute>,
     errorElement: <PageNotFound />,
     children: [
-      // {
-      //   index: true,
-      //   element: <Navigate to='/dashboard' replace />,
-      // },
       {
         index: true,
+        element: <Navigate to='/dashboard' replace />,
+      },
+      {
         path: '/dashboard',
         element: <Dashboard />,
       },
