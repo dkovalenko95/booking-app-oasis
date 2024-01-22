@@ -22,7 +22,7 @@ export function useCheckin() {
         // { queryKey: ['bookings'] }
         { active: true } // invalidate all the queries that are currenty active on the page
       );
-      navigate('/');
+      navigate('/dashboard');
     },
 
     onError: (error) => toast.error(error.message),

@@ -1,4 +1,9 @@
+import CheckoutButton from './CheckoutButton';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import Button from '../../ui/Button';
+import { Flag } from '../../ui/Flag';
+import Tag from '../../ui/Tag';
 
 const StyledTodayItem = styled.li`
   display: grid;
@@ -13,8 +18,53 @@ const StyledTodayItem = styled.li`
   &:first-child {
     border-top: 1px solid var(--color-grey-100);
   }
+  /* &:not(:last-child) {
+    border-bottom: 1px solid var(--color-grey-100);
+  } */
 `;
 
 const Guest = styled.div`
   font-weight: 500;
 `;
+
+function TodayItem({ activity }) {
+  console.log(activity);
+  const { id, status, Guests, numNights } = activity;
+
+  const statusToAction = {
+    'unconfirmed': {
+      action: 'arriving',
+      tag: 'green',
+      button: (
+        <Button
+          $variation='primary'
+          $size='small'
+          as={Link}
+          to={`/checkin/${id}`}
+        >
+          Check in
+        </Button>
+      ),
+    },
+    'checked-in': {
+      action: 'departing',
+      tag: 'blue',
+      button: <CheckoutButton bookingId={id} />,
+    },
+  };
+
+  return (
+    <StyledTodayItem>
+      <Tag $type={statusToAction[status].tag}>
+        {statusToAction[status].action}
+      </Tag>
+      <Flag src={Guests.countryFlag} alt={`Flag of ${Guests.country}`} />
+      <Guest>{Guests.fullName}</Guest>
+      <div>{numNights} nights</div>
+
+      {statusToAction[status].button}
+    </StyledTodayItem>
+  );
+}
+
+export default TodayItem;
