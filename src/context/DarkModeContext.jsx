@@ -4,7 +4,10 @@ import { useLocalStorageState } from '../hooks/useLocalStorageState';
 const DarkModeContext = createContext();
 
 function DarkModeProvider({ children }) {
-  const [darkMode, setDarkMode] = useLocalStorageState(false, 'darkModeOasis');
+  const [darkMode, setDarkMode] = useLocalStorageState(
+    window.matchMedia('(prefers-color-scheme: dark)').matches,
+    'darkModeOasis'
+  );
 
   // Set dark/light css class for root(documentElement)
   useEffect(() => {
