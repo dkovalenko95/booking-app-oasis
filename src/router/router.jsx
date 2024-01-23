@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary';
 import RootLayout from '../layout/RootLayout/RootLayout';
 import PageNotFound from '../pages/PageNotFound';
 import Dashboard from '../pages/Dashboard';
@@ -12,6 +13,7 @@ import Login from '../pages/Login';
 import Booking from '../pages/Booking';
 import Checkin from '../pages/Checkin';
 import ProtectedRoute from './ProtectedRoute';
+import ErrorFallback from '../ui/ErrorFallback';
 
 export const router = createBrowserRouter([
   {
@@ -20,10 +22,16 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <ProtectedRoute>
-      <RootLayout />
-    </ProtectedRoute>,
-    errorElement: <PageNotFound />,
+    element: (
+      <ErrorBoundary
+        FallbackComponent={ErrorFallback}
+        onReset={() => window.location.replace('/')}
+      >
+        <ProtectedRoute>
+          <RootLayout />
+        </ProtectedRoute>
+      </ErrorBoundary>
+    ),
     children: [
       {
         index: true,
@@ -62,5 +70,9 @@ export const router = createBrowserRouter([
         element: <Account />
       },
     ],
+  },
+  {
+    path: '/*',
+    element: <PageNotFound />,
   },
 ]);
