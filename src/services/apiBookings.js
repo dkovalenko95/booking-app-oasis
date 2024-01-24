@@ -2,6 +2,39 @@ import { getToday } from '../utils/helpers';
 import supabase from './supabase';
 import { PAGE_CAPACITY } from '../utils/constants';
 
+export async function createGuest(guestData) {
+  const { error } = await supabase
+    .from('Guests')
+    .insert({ ...guestData })
+
+  if (error) {
+    console.error(error);
+    throw new Error('Guest could not be created')
+  };
+
+  // const query = supabase
+    // .from('Guests')
+    // .insert({ ...guestData })
+    // .select()
+
+  // const { data, error } = await query
+    // .select()
+    // .single() // return data as a single object instead of an array of objects
+
+  // if (error) {
+    // console.error(error);
+    // throw new Error('Guest could not be created')
+  // };
+
+  // return data;
+};
+
+export async function createBooking(bookingData) {
+  const query = supabase
+    .from('Bookings')
+    .insert({ ...bookingData })
+};
+
 export async function getBookings({ filter, sortBy, page }) {
   // const { data, error } = await supabase
   let query = supabase
