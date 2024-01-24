@@ -2,6 +2,20 @@ import { getToday } from '../utils/helpers';
 import supabase from './supabase';
 import { PAGE_CAPACITY } from '../utils/constants';
 
+export async function getCountriesWithFlags(countriesArray) {
+  // TODO: Add try/catch
+  const countriesWithFlags = await Promise.all(countriesArray.map(async(country) => {
+    const response = await fetch(`https://purecatamphetamine.github.io/country-flag-icons/3x2/${country.value}.svg`);
+    const flag = response.ok ? response.url : null;
+
+    return {
+      ...country,
+      flag
+    };
+  }));
+  return countriesWithFlags;
+};
+
 export async function createGuest(guestData) {
   const { error } = await supabase
     .from('Guests')

@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { COUNTRIES } from './countries';
 import { useEffect, useRef, useState } from 'react';
+import { useFetchCountries } from './useFetchCountries';
+import Spinner from '../../../ui/Spinner';
 
 const StyledContainer = styled.div`
   margin-top: 1rem;
@@ -55,7 +57,7 @@ const StyledSvg = styled.svg`
 
 // Opened list
 const StyledSearchContainer = styled.div`
-  position: sticky;
+  /* position: sticky; */
   top: 0;
   z-index: 10;
   
@@ -117,6 +119,10 @@ const StyledInput = styled.input`
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
+
+  &::placeholder {
+    color: var(--color-grey-400);
+  }
 `;
 
 const StyledSelectedIndicator = styled.span`
@@ -149,8 +155,12 @@ const StyledScrollableDiv = styled.div`
   }
 `;
 
-export default function CountrySelector({ id, open, onToggle, onChange, selectedValue}) {
+export default function CountrySelector({ id, open, onToggle, onChange, selectedValue }) {
   const ref = useRef(null);
+
+  const { countries, isLoading } = useFetchCountries();
+    
+  console.log(countries);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -158,19 +168,23 @@ export default function CountrySelector({ id, open, onToggle, onChange, selected
         ref.current &&
         !ref.current.contains(event.target) &&
         open
-      ) {
-        onToggle();
-        setQuery('');
-      }
-    };
+        ) {
+          onToggle();
+          setQuery('');
+        }
+      };
+      
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [ref, onToggle, open]);
+    
+    const [query, setQuery] = useState('');
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [ref, onToggle, open]);
-
-  const [query, setQuery] = useState('');
+    if (isLoading) return <Spinner />;
+    
+    const selectedCountry = countries.find((option) => option.value === selectedValue);
 
   return (
     <div ref={ref}>
@@ -182,11 +196,12 @@ export default function CountrySelector({ id, open, onToggle, onChange, selected
         >
           <StyledSelectedContainer>
             <StyledImage
-              alt={`${selectedValue.value}`}
-              src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${selectedValue.value}.svg`}
-              className={'inline mr-2 h-4 rounded-sm'}
+              alt={selectedCountry.value}
+              src={selectedCountry.flag}
+              // src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${selectedValue.value}.svg`}
+              // src={`https://flagcdn.com/${selectedValue.value.toLowerCase()}.svg`}
             />
-            {selectedValue.title}
+            {selectedCountry.title}
           </StyledSelectedContainer>
           
           <StyledSelectArrows>
@@ -219,21 +234,21 @@ export default function CountrySelector({ id, open, onToggle, onChange, selected
                     type='search'
                     name='search'
                     autoComplete='off'
-                    placeholder='Search a country'
+                    placeholder='Search a country...'
                     onChange={(e) => setQuery(e.target.value)}
                   />
                 </StyledSearch>
               </StyledSearchContainer>
 
               <StyledScrollableDiv>
-                {COUNTRIES.filter((country) =>
+                {countries.filter((country) =>
                   country.title.toLowerCase().startsWith(query.toLowerCase())
                 ).length === 0 ? (
                   <StyledLi>
                     No countries found
                   </StyledLi>
                 ) : (
-                  COUNTRIES.filter((country) =>
+                  countries.filter((country) =>
                     country.title.toLowerCase().startsWith(query.toLowerCase())
                   ).map((value, index) => {
                     return (
@@ -248,8 +263,10 @@ export default function CountrySelector({ id, open, onToggle, onChange, selected
                         }}
                       >
                         <StyledImage
-                          alt={`${value.value}`}
-                          src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${value.value}.svg`}
+                          alt={value.value}
+                          src={value.flag}
+                          // src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${value.value}.svg`}
+                          // src={`https://flagcdn.com/${value.value.toLowerCase()}.svg`}
                         />
 
                         <span>
