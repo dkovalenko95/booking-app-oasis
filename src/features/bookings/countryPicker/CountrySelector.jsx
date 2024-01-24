@@ -80,6 +80,7 @@ const StyledUl = styled.ul`
 `;
 
 const StyledLi = styled.li`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: start;
@@ -121,7 +122,11 @@ const StyledInput = styled.input`
 const StyledSelectedIndicator = styled.span`
   display: flex;
   align-items: center;
-  padding-left: 80%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  padding-right: 3rem;
 `;
 
 const StyledScrollableDiv = styled.div`
