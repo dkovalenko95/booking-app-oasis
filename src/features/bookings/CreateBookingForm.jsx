@@ -1,14 +1,26 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
 import Button from '../../ui/Button';
+import CountrySelector from './countryPicker/CountrySelector';
+import { COUNTRIES } from './countryPicker/countries';
 
 function CreateBookingForm({ onCloseModal }) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
+  // Country picker
+  const [country, setCountry] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+
   function onSubmit(data) {
-    console.log(data);
+    const newGuestData = {
+      ...data,
+      countryName: country.title,
+    };
+    console.log(newGuestData);
   };
 
   return (
@@ -40,7 +52,17 @@ function CreateBookingForm({ onCloseModal }) {
         />
       </FormRow>
 
-      <FormRow label='Nationality' error={errors?.nationality?.message}>
+      <CountrySelector
+        register={register}
+        id='country-selector'
+        open={isOpen}
+        onToggle={() => setIsOpen(!isOpen)}
+        countries={COUNTRIES}
+        country={country}
+        setCountry={setCountry}
+      />
+
+      {/* <FormRow label='Nationality' error={errors?.nationality?.message}>
         <Input
           type='text'
           id='nationality'
@@ -49,7 +71,7 @@ function CreateBookingForm({ onCloseModal }) {
             required: 'This field is required',
           })}
         />
-      </FormRow>
+      </FormRow> */}
 
       <FormRow label='National ID' error={errors?.nationalID?.message}>
         <Input
