@@ -6,9 +6,12 @@ import Input from '../../ui/Input';
 import Button from '../../ui/Button';
 import CountrySelector from './countryPicker/CountrySelector';
 import { COUNTRIES } from './countryPicker/countries';
+import { useCreateGuest } from './hooks/useCreateGuest';
 
 function CreateBookingForm({ onCloseModal }) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+  const { createGuest, isCreatingGuest } = useCreateGuest();
 
   // Country picker
   const [country, setCountry] = useState(null);
@@ -18,9 +21,19 @@ function CreateBookingForm({ onCloseModal }) {
   function onSubmit(data) {
     const newGuestData = {
       ...data,
-      countryName: country.title,
+      nationality: country.title,
+      countryFlag: `https://flagcdn.com/${country.value.toLowerCase()}.svg`,
     };
-    console.log(newGuestData);
+
+    createGuest({
+      ...newGuestData,
+    }, {
+      onSuccess: () => {
+        reset();
+        setCountry(null);
+        // onCloseModal?.();
+      }
+    });
   };
 
   return (
@@ -30,7 +43,7 @@ function CreateBookingForm({ onCloseModal }) {
         <Input
           type='text'
           id='fullName'
-          // disabled={isProcessing}
+          disabled={isCreatingGuest}
           {...register('fullName', {
             required: 'This field is required'
           })}
@@ -41,7 +54,7 @@ function CreateBookingForm({ onCloseModal }) {
         <Input
           type='email'
           id='email'
-          // disabled={isProcessing}
+          disabled={isCreatingGuest}
           {...register('email', {
             required: 'This field is required',
             pattern: {
@@ -52,32 +65,23 @@ function CreateBookingForm({ onCloseModal }) {
         />
       </FormRow>
 
-      <CountrySelector
-        register={register}
-        id='country-selector'
-        open={isOpen}
-        onToggle={() => setIsOpen(!isOpen)}
-        countries={COUNTRIES}
-        country={country}
-        setCountry={setCountry}
-      />
-
-      {/* <FormRow label='Nationality' error={errors?.nationality?.message}>
-        <Input
-          type='text'
-          id='nationality'
-          // disabled={isProcessing}
-          {...register('nationality', {
-            required: 'This field is required',
-          })}
+      <FormRow label='Guest nationality' orientation='selector'>
+        <CountrySelector
+          register={register}
+          id='country-selector'
+          open={isOpen}
+          onToggle={() => setIsOpen(!isOpen)}
+          countries={COUNTRIES}
+          country={country}
+          setCountry={setCountry}
         />
-      </FormRow> */}
+      </FormRow>
 
       <FormRow label='National ID' error={errors?.nationalID?.message}>
         <Input
           type='text'
           id='nationalID'
-          // disabled={isProcessing}
+          disabled={isCreatingGuest}
           {...register('nationalID', {
             required: 'This field is required',
           })}
@@ -89,13 +93,13 @@ function CreateBookingForm({ onCloseModal }) {
         <Button
           $variation='secondary'
           type='reset'
-          // disabled={isProcessing}
+          disabled={isCreatingGuest}
           onClick={() => onCloseModal?.()} // conditional call with optional chaining
         >
           Cancel
         </Button>
         <Button
-          // disabled={isProcessing}
+          disabled={isCreatingGuest}
         >
           Create booking
         </Button>

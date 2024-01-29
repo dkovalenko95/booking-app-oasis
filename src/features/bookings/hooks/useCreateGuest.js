@@ -5,11 +5,9 @@ import toast from 'react-hot-toast';
 export function useCreateGuest() {
   const { mutate: createGuest, isPending: isCreatingGuest } = useMutation({
     mutationFn: createGuestAPI,
-
     onSuccess: () => {
       toast.success('Guest successfuly created');
     },
-
     onError: (error) => toast.error(error.message),
   });
 

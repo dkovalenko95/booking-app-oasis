@@ -8,6 +8,10 @@ const StyledFormRow = styled.div`
     props.orientation === 'vertical' ? '1fr' : '21rem 3fr 1.2fr'};
   gap: ${(props) => (props.orientation === 'vertical' ? '0.8rem' : '2.4rem')};
 
+  grid-template-columns: ${(props) =>
+    props.orientation === 'selector' && '21rem 3fr 1.2fr'};
+  gap: ${(props) => (props.orientation === 'selector' && '2.4rem')};
+
   padding: 1.2rem 0;
 
   &:first-child {
@@ -27,7 +31,7 @@ const StyledFormRow = styled.div`
 
   /* Special treatment if the row contains buttons, and if it's NOT a vertical row */
   ${(props) =>
-    props.orientation !== 'vertical' &&
+    props.orientation !== 'vertical' && props.orientation !== 'selector' &&
     css`
       &:has(button) {
         display: flex;
@@ -35,6 +39,13 @@ const StyledFormRow = styled.div`
         gap: 1.2rem;
       }
     `}
+
+  ${(props) =>
+  props.orientation === 'selector' &&
+  css`
+    display: grid;
+    align-items: center;
+  `}
 `;
 
 const Label = styled.label`

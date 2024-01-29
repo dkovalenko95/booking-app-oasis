@@ -1,14 +1,16 @@
 import styled from 'styled-components';
 
 export const StyledContainer = styled.div`
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   position: relative;
+  /* padding: 0.8rem 1.2rem; */
 `;
 
 // Select Country button
 export const StyledToggleSelectorBtn = styled.button`
+  height: 4rem;
   width: 100%;
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 500;
   line-height: 1.5rem;
   cursor: pointer;
