@@ -1,0 +1,108 @@
+.datePickerStyle {}
+
+.calendarStyle {}
+
+.react-date-picker__wrapper {
+  font-family: 'Poppins', sans-serif;
+  color: var(--color-grey-700);
+
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+
+  align-items: center;
+
+  font-weight: 500;
+  height: 4rem;
+  border: 1px solid var(--color-grey-300);
+  background-color: var(--color-grey-0);
+  border-radius: var(--border-radius-sm);
+  padding: 0.8rem 1.2rem;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+}
+
+.react-date-picker__inputGroup__input input:focus {
+  outline: none;
+}
+
+input:focus, button:focus, textarea:focus, select:focus {
+  border-radius: var(--border-radius-sm);
+}
+
+.react-date-picker__button:focus {
+  outline: none;
+}
+
+.react-date-picker__inputGroup__input:invalid {
+  background: none;
+}
+
+.react-date-picker__button svg {
+  stroke: var(--color-grey-700);
+}
+
+.react-date-picker__button:enabled:hover .react-date-picker__button__icon, .react-date-picker__button:enabled:focus .react-date-picker__button__icon {
+  stroke: var(--color-brand-700);
+}
+
+.react-date-picker__calendar .react-calendar {
+  font-family: 'Poppins', sans-serif;
+  color: var(--color-grey-700);
+
+  width: 300px;
+
+  border: 1px solid var(--color-grey-300);
+  background-color: var(--color-grey-0);
+  border-radius: var(--border-radius-sm);
+  padding: 0.4rem 0.6rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.react-calendar__navigation {
+  display: flex;
+  height: 4rem;
+  margin-bottom: 1rem;
+}
+
+.react-calendar__navigation button {
+  font-size: 3rem;
+  min-width: 3rem;
+  background: none;
+}
+
+.react-calendar__navigation button:enabled:hover, .react-calendar__navigation button:enabled:focus {
+  background-color: var(--color-grey-200);
+  border-radius: var(--border-radius-sm);
+  outline: none;
+}
+
+.react-calendar__navigation button span {
+  font-size: 1.6rem;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  font-size: 1.1rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.react-calendar__tile {
+  font-size: 1.2rem;
+}
+
+.react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus {
+  background-color: var(--color-grey-200);
+  border-radius: var(--border-radius-sm);
+}
+
+.react-calendar__tile--active {
+  background: var(--color-brand-700);
+  color: var(--color-grey-100);
+  border-radius: var(--border-radius-sm);
+  font-size: 1.3rem;
+}
+
+.react-calendar__tile--active:enabled:hover, .react-calendar__tile--active:enabled:focus {
+  background: var(--color-brand-600);
+}

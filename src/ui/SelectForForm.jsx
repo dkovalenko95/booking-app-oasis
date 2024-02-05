@@ -15,14 +15,13 @@ const StyledSelect = styled.select`
   width: 100%;
 `;
 
-function Select({ options, currActiveValue, onChange, ...props }) {
+function SelectForForm({ value, onChange, children, ...props }) {
   return (
-    <StyledSelect onChange={onChange} value={currActiveValue} {...props}>
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>{option.label}</option>
-      ))}
+    <StyledSelect value={value} onChange={onChange} {...props}>
+      { children }
     </StyledSelect>
   );
 }
 
-export default Select;
+export default SelectForForm;
+

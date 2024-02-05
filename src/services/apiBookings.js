@@ -44,9 +44,14 @@ export async function createGuest(guestData) {
 };
 
 export async function createBooking(bookingData) {
-  const query = supabase
+  const { error } = await supabase
     .from('Bookings')
     .insert({ ...bookingData })
+
+  if (error) {
+    console.error(error);
+    throw new Error('Booking could not be created')
+  };
 };
 
 export async function getBookings({ filter, sortBy, page }) {

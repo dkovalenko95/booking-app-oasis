@@ -2,7 +2,7 @@ import { cloneElement, useContext } from 'react';
 import { createContext, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { HiXMark } from 'react-icons/hi2';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useOutsideClick } from '../hooks/useOutsideClick';
 
 const StyledModal = styled.div`
@@ -15,6 +15,15 @@ const StyledModal = styled.div`
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
   transition: all 0.5s;
+
+  // For Create Booking form scroll
+  ${(props) =>
+    props.$type !== 'bookForm' &&
+    css`
+      height: 80%;
+      overflow-y: auto;
+    `
+  }
 `;
 
 const Overlay = styled.div`
