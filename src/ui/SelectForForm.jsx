@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -13,6 +13,25 @@ const StyledSelect = styled.select`
   font-weight: 500;
   box-shadow: var(--shadow-sm);
   width: 100%;
+
+  ${(props) =>
+    props.$status === 'unconfirmed' &&
+    css`
+      color: var(--color-blue-700);
+      background-color: var(--color-blue-100);
+    `}
+  ${(props) =>
+    props.$status === 'checked-in' &&
+    css`
+      color: var(--color-green-700);
+      background-color: var(--color-green-100);
+    `}
+  ${(props) =>
+    props.$status === 'checked-out' &&
+    css`
+      color: var(--color-silver-700);
+      background-color: var(--color-silver-100);
+    `}
 `;
 
 function SelectForForm({ value, onChange, children, ...props }) {

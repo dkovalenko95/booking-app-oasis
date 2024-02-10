@@ -46,6 +46,10 @@ input:focus, button:focus, textarea:focus, select:focus {
   stroke: var(--color-brand-700);
 }
 
+.react-date-picker__clear-button {
+  display: none;
+}
+
 .react-date-picker__calendar .react-calendar {
   font-family: 'Poppins', sans-serif;
   color: var(--color-grey-700);

@@ -16,35 +16,12 @@ import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import './datePicker/datePicker.css';
 import Checkbox from '../../ui/Checkbox';
+import { formatCurrency } from '../../utils/helpers';
+import { useSettings } from '../settings/hooks/useSettings';
 
 function CreateBookingForm({ onCloseModal }) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
-  const { createGuest, isCreatingGuest } = useCreateGuest();
-  const { cabins, isLoading } = useFetchCabins();
-
-  // Country picker
-  const [country, setCountry] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-
-  // Date picker
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
-  const numberOfNights = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  const [confirmNights, setConfirmNights] = useState(false);
-
-  // Guests number
-  const [currCabin, setCurrCabin] = useState(null);
-  const [numGuests, setNumGuests] = useState(null);
-
-  // Max guests for current cabin
-  useEffect(() => {
-    if (currCabin) {
-      setNumGuests(currCabin.maxCapacity);
-    }
-  }, [currCabin])
-  
   // Current guest
   const [guestIsCreated, setGuestIsCreated] = useState({
     fullName: "John Green",
@@ -53,29 +30,71 @@ function CreateBookingForm({ onCloseModal }) {
     nationality: "United Kingdom",
     countryFlag: "https://flagcdn.com/gb.svg"
   });
+
+  // FORM GUEST(1st step)
+  const { createGuest, isCreatingGuest } = useCreateGuest();
+  // Country picker
+  const [country, setCountry] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
   
-  // Loading cabins
+  // FORM BOOKING(2nd step)
+  // Fetch cabins
+  const { cabins, isLoading } = useFetchCabins();
+  const { settings, isLoading: isLoadingSettings } = useSettings();
+
+  // Date picker
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date(new Date().getTime() + (24 * 60 * 60 * 1000)));
+  const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+  const numberOfNights = Math.floor(timeDiff / (1000 * 3600 * 24));
+  const [confirmNights, setConfirmNights] = useState(false);
+
+  // Guests number
+  const [currCabin, setCurrCabin] = useState(null);
+  const [numGuests, setNumGuests] = useState(null);
+
+  console.log(currCabin);
+
+  // Breakfast 
+  const [hasBreakfast, setHasBreakfast] = useState(true);
+  console.log(hasBreakfast);
+
+  // Paid
+  const [hasPaid, setHasPaid] = useState(false);
+
+  // Status
+  const [status, setStatus] = useState('unconfirmed');
+
+  // Set current cabin after fetched
   useEffect(() => {
     if (cabins && cabins.length > 0) {
       setCurrCabin(cabins[0]);
     }
   }, [cabins]);
+
+  // Set max guests capacity for current cabin
+  useEffect(() => {
+    if (currCabin) {
+      setNumGuests(currCabin.maxCapacity);
+    }
+  }, [currCabin])
   
-  // Capacity range
+  // Capacity range for selecting possible number of guest for current cabin 
   let capacityRange;
   if (currCabin !== null) capacityRange = [...Array(currCabin.maxCapacity).keys()].map((num) => num + 1);
 
 
-
-  function onSubmit(data) {
+  // FORM SUBMISSION - 1st step - create new guest
+  function onSubmitGuest(data) {
+    // 1st step - create guest data
     const newGuestData = {
       ...data,
       nationality: country.title,
       countryFlag: `https://flagcdn.com/${country.value.toLowerCase()}.svg`,
     };
-
     console.log(newGuestData);
 
+    // 
     createGuest({
       ...newGuestData,
     }, {
@@ -88,10 +107,19 @@ function CreateBookingForm({ onCloseModal }) {
     });
   };
 
+  // FORM SUBMISSION - 2nd step - create new booking
+  function onSubmitBooking(data) {
+    console.log(data);
+  };
+
   if (guestIsCreated) {
     return (
-      <Form $type='bookForm' onSubmit={handleSubmit(onSubmit, /* onError */)} type={onCloseModal ? 'modal' : 'regular'}>
-  
+      <Form
+        $type='bookForm'
+        onSubmit={handleSubmit(onSubmitBooking, /* onError */)}
+        type={onCloseModal ? 'modal' : 'regular'}
+      >
+
         <FormRow id='guest' label='Creating booking for:'>
           <div>
             <span style={{ fontSize: '1.6rem' }}>{guestIsCreated.fullName}</span>
@@ -138,8 +166,9 @@ function CreateBookingForm({ onCloseModal }) {
         </FormRow>
 
         <FormRow id='numGuests' label='Number of guests:'>
+          {/* If no 'numGuests' value, create standart input to manually set the number  */}
           <SelectForForm
-            value={numGuests}
+            value={numGuests ? numGuests : 'Input number of guests'}
             onChange={(e) => {
               const selected = e.target.value;
               setNumGuests(selected);
@@ -151,24 +180,43 @@ function CreateBookingForm({ onCloseModal }) {
         </FormRow>
 
         <FormRow id='breakfast' label='Does booking include breakfast?'>
-          <SelectForForm>
+          <SelectForForm onChange={(e) => {
+            let selected = e.target.value;
+            selected = selected === 'yesBreakfast' ? true : false;
+            setHasBreakfast(selected);
+          }}>
             <option value='yesBreakfast'>Yes</option>  
             <option value='noBreakfast'>No</option>  
           </SelectForForm>
         </FormRow>
 
         <FormRow id='paid' label='Did the client pay for the booking?'>
-          <SelectForForm>
-            <option value='yesPaid'>Yes</option>  
-            <option value='noPaid'>No</option>  
+          <SelectForForm onChange={(e) => {
+            let selected = e.target.value;
+            selected = selected === 'hasPaid' ? true : false;
+            setHasPaid(selected);
+
+            if (selected === 'notPaid') {
+              setStatus('unconfirmed');
+            }
+          }}>
+            <option value='notPaid'>No</option>  
+            <option value='hasPaid'>Yes</option>  
           </SelectForForm>
         </FormRow>
 
         <FormRow id='bookStatus' label='Booking status:'>
-          <SelectForForm>
-            <option value='unconfirmed'>Unconfirmed</option>  
-            <option value='checked-in'>Checked-in</option>  
-            <option value='checked-out'>Checked-out</option>  
+          <SelectForForm $status={status} onChange={(e) => {
+            let selected = e.target.value;
+            setStatus(selected);
+          }}>
+            <option style={{ color: 'var(--color-blue-700)', backgroundColor: 'var(--color-blue-100' }} value='unconfirmed'>Unconfirmed</option>  
+            {hasPaid === 'hasPaid' && 
+              <>
+                <option style={{ color: 'var(--color-green-700)', backgroundColor: 'var(--color-green-100' }} value='checked-in'>Checked-in</option>  
+                <option style={{ color: 'var(--color-silver-700)', backgroundColor: 'var(--color-silver-100' }} value='checked-out'>Checked-out</option>
+              </>
+            }  
           </SelectForForm>
         </FormRow>
         
@@ -176,18 +224,33 @@ function CreateBookingForm({ onCloseModal }) {
           <Textarea />
         </FormRow>
 
-        {/* <div style={{display: 'flex', gap: '5rem', fontSize: '2rem', marginBottom: '2rem'}}> 
-          <div style={{display: 'flex', gap: '1rem', fontSize: '2rem', marginBottom: '2rem'}}>
-            <p>Cabin price for X nights:</p>
+        <FormRow id='summary' label='Summary:'>
+          <div style={{display: 'flex', gap: '1rem', flexDirection: 'column', justifyContent: 'center', fontSize: '1.6rem'}}> 
+            <p>
+              Cabin <span style={{ fontWeight: '500' }}>
+                {currCabin?.name}
+              </span> price for <span style={{ fontWeight: '500' }}>
+                {numberOfNights}
+              </span> nights: <span style={{ fontWeight: '500' }}>
+                {formatCurrency(currCabin?.regularPrice * numberOfNights)}
+              </span>
+            </p>
+            <p>
+              Breakfast price: <span style={{ fontWeight: '500' }}>
+                {hasBreakfast ? formatCurrency((numberOfNights * numGuests) * settings?.breakfastPrice) : '-'}
+              </span>
+            </p>   
+            <p>
+              Total price: <span style={{ fontWeight: '500' }}>
+                {hasBreakfast 
+                  ? formatCurrency((currCabin?.regularPrice * numberOfNights) + ((numberOfNights * numGuests) * settings?.breakfastPrice)) 
+                  : formatCurrency(currCabin?.regularPrice * numberOfNights)
+                }
+              </span>
+            </p>    
           </div>
-          <div style={{display: 'flex', gap: '1rem', fontSize: '2rem', marginBottom: '2rem'}}>
-            <p>Breakfast price:</p>
-          </div>
-          <div style={{display: 'flex', gap: '1rem', fontSize: '2rem', marginBottom: '2rem'}}>
-            <p>Total price:</p>
-          </div>
-        </div> */}
-  
+        </FormRow>
+
         <FormRow id='control-btns'>
           {/* type is an HTML attribute! */}
           <Button
@@ -198,9 +261,7 @@ function CreateBookingForm({ onCloseModal }) {
           >
             Cancel
           </Button>
-          <Button
-            disabled={isCreatingGuest}
-          >
+          <Button disabled={isCreatingGuest}>
             Create booking
           </Button>
         </FormRow>
@@ -209,7 +270,7 @@ function CreateBookingForm({ onCloseModal }) {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, /* onError */)} type={onCloseModal ? 'modal' : 'regular'}>
+    <Form onSubmit={handleSubmit(onSubmitGuest, /* onError */)} type={onCloseModal ? 'modal' : 'regular'}>
 
       <FormRow label='Guest full name' error={errors?.fullName?.message}>
         <Input
