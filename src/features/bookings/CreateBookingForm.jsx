@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
@@ -18,18 +18,37 @@ import './datePicker/datePicker.css';
 import Checkbox from '../../ui/Checkbox';
 import { formatCurrency } from '../../utils/helpers';
 import { useSettings } from '../settings/hooks/useSettings';
+import { useFetchGuests } from './hooks/useFetchGuests';
+
+function formatDate(dateString) {
+  const dateObject = new Date(dateString);
+  const year = dateObject.getFullYear();
+  const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Month is zero-based, so adding 1
+  const day = String(dateObject.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day} 00:00:00`;
+  return formattedDate;
+};
+
+function getCurrtGuestId(curr, arr) {
+  const currGuest = arr.find((person) => person.fullName === curr.fullName);
+  console.log(currGuest);
+  return +currGuest.id;
+};
 
 function CreateBookingForm({ onCloseModal }) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   // Current guest
-  const [guestIsCreated, setGuestIsCreated] = useState({
-    fullName: "John Green",
-    email: "new@user.com",
-    nationalID: 12345678,
-    nationality: "United Kingdom",
-    countryFlag: "https://flagcdn.com/gb.svg"
-  });
+  // const [guestIsCreated, setGuestIsCreated] = useState({
+  //   fullName: "John Green",
+  //   email: "new@user.com",
+  //   nationalID: 12345678,
+  //   nationality: "United Kingdom",
+  //   countryFlag: "https://flagcdn.com/gb.svg"
+  // });
+
+  const [guestIsCreated, setGuestIsCreated] = useState(null);
+  console.log(guestIsCreated);
 
   // FORM GUEST(1st step)
   const { createGuest, isCreatingGuest } = useCreateGuest();
@@ -39,44 +58,58 @@ function CreateBookingForm({ onCloseModal }) {
   
   // FORM BOOKING(2nd step)
   // Fetch cabins
-  const { cabins, isLoading } = useFetchCabins();
+  const { cabins, isLoading: isLoadingCabins } = useFetchCabins();
+  // Fetch settings
   const { settings, isLoading: isLoadingSettings } = useSettings();
+  // Fetch guests
+  const { guests, isLoading: isLoadingGuests } = useFetchGuests();
 
   // Date picker
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date(new Date().getTime() + (24 * 60 * 60 * 1000)));
-  const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
-  const numberOfNights = Math.floor(timeDiff / (1000 * 3600 * 24));
-  const [confirmNights, setConfirmNights] = useState(false);
 
-  // Guests number
+  // Nights number
+  const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+  const numNights = Math.floor(timeDiff / (1000 * 3600 * 24));
+
+  // Cabin and Guests number
   const [currCabin, setCurrCabin] = useState(null);
   const [numGuests, setNumGuests] = useState(null);
 
-  console.log(currCabin);
-
   // Breakfast 
   const [hasBreakfast, setHasBreakfast] = useState(true);
-  console.log(hasBreakfast);
 
   // Paid
-  const [hasPaid, setHasPaid] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
 
   // Status
   const [status, setStatus] = useState('unconfirmed');
 
+  // Additonal info
+  const observationRef = useRef(null);
+
+  // Confirm form data
+  const [confirmForm, setConfirmForm] = useState(false);
+
+  // Summary
+  // TODO: Workaround to ommit useEffect
+  const [summary, setSummary] = useState(null);
+  useEffect(() => {
+    setSummary({
+      cabinPrice: currCabin?.regularPrice * numNights,
+      extrasPrice: (numNights * numGuests) * settings?.breakfastPrice,
+      totalPrice: (currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice),
+    });
+  }, [currCabin, numNights, numGuests, settings]);
+
   // Set current cabin after fetched
   useEffect(() => {
-    if (cabins && cabins.length > 0) {
-      setCurrCabin(cabins[0]);
-    }
+    if (cabins && cabins.length > 0) setCurrCabin(cabins[0]);
   }, [cabins]);
 
   // Set max guests capacity for current cabin
   useEffect(() => {
-    if (currCabin) {
-      setNumGuests(currCabin.maxCapacity);
-    }
+    if (currCabin) setNumGuests(currCabin.maxCapacity);
   }, [currCabin])
   
   // Capacity range for selecting possible number of guest for current cabin 
@@ -93,8 +126,9 @@ function CreateBookingForm({ onCloseModal }) {
       countryFlag: `https://flagcdn.com/${country.value.toLowerCase()}.svg`,
     };
     console.log(newGuestData);
+    setGuestIsCreated(newGuestData);
 
-    // 
+    // 2nd - step API interaction
     createGuest({
       ...newGuestData,
     }, {
@@ -108,150 +142,225 @@ function CreateBookingForm({ onCloseModal }) {
   };
 
   // FORM SUBMISSION - 2nd step - create new booking
-  function onSubmitBooking(data) {
-    console.log(data);
+  function onSubmitBooking() {
+    // 1st step - create booking data
+    const newBookingData = {
+      // startDate: startDate,
+      startDate: formatDate(startDate),
+      // endDate: endDate,
+      endDate: formatDate(endDate),
+      numNights: +numNights,
+      numGuests: +numGuests,
+      cabinPrice: +summary?.cabinPrice,
+      extrasPrice: +summary?.extrasPrice,
+      totalPrice: +summary?.totalPrice,
+      status: String(status),
+      hasBreakfast: String(hasBreakfast).toUpperCase(),
+      isPaid: String(isPaid).toUpperCase(),
+      observation: observationRef.current.value,
+      cabinId: +currCabin?.id,
+      guestId: getCurrtGuestId(guestIsCreated, guests),
+    };
+    console.log(newBookingData);
+
+    // 2nd step - API interaction
   };
 
+  // TODO: Work on 1. select existed guest from data base OR  2.create new one
   if (guestIsCreated) {
     return (
       <Form
-        $type='bookForm'
+        name='create-booking'
+        id='create-booking'
         onSubmit={handleSubmit(onSubmitBooking, /* onError */)}
-        type={onCloseModal ? 'modal' : 'regular'}
+        $type={onCloseModal ? 'modal' : 'regular'}
       >
 
-        <FormRow id='guest' label='Creating booking for:'>
-          <div>
+        <FormRow id='guest-select' descr='Creating booking for:'>
+          <div id='guest-select'>
             <span style={{ fontSize: '1.6rem' }}>{guestIsCreated.fullName}</span>
             <img style={{ marginLeft: '0.5rem' }} width='20rem' src={guestIsCreated.countryFlag} />
           </div>
         </FormRow>
 
-        {isLoading
+          {isLoadingCabins
+            ? <SpinnerMini />
+            : <FormRow id='cabin-select' label='Choose the cabin:'>
+                <SelectForForm
+                  id='cabin-select'
+                  onChange={(e) => {
+                    const cabinNum = e.target.value;
+                    const selectedCabin = cabins.find((cabin) => cabin.name === cabinNum);
+                    setCurrCabin(selectedCabin);
+                  }}
+                >
+                  {cabins.map((cabin) => (
+                    <option key={cabin.id} value={cabin.name}>{cabin.name}</option>
+                  ))}  
+                </SelectForForm>
+              </FormRow>
+          }
+
+        <FormRow
+          id='date-start-select'
+          orientation='selector'
+          descr='Start date:'
+        >
+          <DatePicker
+            id='date-start-select'
+            format='dd.MM.yyyy'
+            onChange={setStartDate}
+            value={startDate}
+          />
+        </FormRow>
+        <FormRow
+          id='date-end-select'
+          orientation='selector'
+          descr='End date:'
+        >
+          <DatePicker
+            id='date-end-select'
+            format='dd.MM.yyyy'
+            onChange={setEndDate}
+            value={endDate}
+          />
+        </FormRow>
+
+        <FormRow id='num-nights-select' descr='Number of nights:'>
+          <p style={{ fontSize: '1.6rem', paddingLeft: '1.6rem' }}>{numNights}</p>
+        </FormRow>
+
+          {isLoadingCabins
+            ? <SpinnerMini />
+            : <FormRow id='num-guests-select' label='Number of guests:'>
+                <SelectForForm
+                  id='num-guests-select'
+                  value={numGuests ?? 'Select number of guests'}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    setNumGuests(selected);
+                  }}
+                >
+                  {currCabin && capacityRange.map((num) => (
+                    <option value={num} name={num} key={num}>{num}</option>
+                  ))}
+                </SelectForForm>
+              </FormRow>
+          }
+
+        {isLoadingSettings
           ? <SpinnerMini />
-          : <FormRow id='cabin' label='Choose the cabin:'>
-              <SelectForForm onChange={(e) => {
-                const cabinNum = e.target.value;
-                const selectedCabin = cabins.find((cabin) => cabin.name === cabinNum);
-                setCurrCabin(selectedCabin);
-              }}>
-                {cabins.map((cabin) => (
-                  <option key={cabin.id} value={cabin.name}>{cabin.name}</option>
-                ))}  
-            </SelectForForm>
-          </FormRow>
+          : <FormRow
+              id='breakfast-select'
+              label='Does booking include breakfast?'
+              info={`Breakfast price for 1 person is ${formatCurrency(settings?.breakfastPrice)}`}
+            >
+              <SelectForForm
+                id='breakfast-select'
+                onChange={(e) => {
+                  let selected = e.target.value;
+                  selected = selected === 'yesBreakfast' ? true : false;
+                  setHasBreakfast(selected);
+                }}
+              >
+                <option value='yesBreakfast'>Yes</option>  
+                <option value='noBreakfast'>No</option>  
+              </SelectForForm>
+            </FormRow>
         }
 
-        <FormRow id='startDate' orientation='selector' label='Start date:'>
-          <DatePicker id='date-picker' format='dd.MM.yyyy' calendarClassName='calendarStyle' className='datePickerStyle' onChange={setStartDate} value={startDate} />
-        </FormRow>
-
-        <FormRow id='endDate' orientation='selector' label='End date:'>
-          <DatePicker id='date-picker' format='dd.MM.yyyy' calendarClassName='calendarStyle' className='datePickerStyle' onChange={setEndDate} value={endDate} />
-        </FormRow>
-
-        <FormRow id='numNights' label='Number of nights:'>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <p style={{ fontSize: '1.6rem', paddingLeft: '1.6rem' }}>{numberOfNights}</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <p>Confirm number of nights:</p>
-              <Checkbox
-                id='numNights' 
-                checked={confirmNights}
-                onChange={() => setConfirmNights((confirm) => !confirm)}
-                disabled={numberOfNights < 1}
-              />
-            </div>
-          </div>
-        </FormRow>
-
-        <FormRow id='numGuests' label='Number of guests:'>
-          {/* If no 'numGuests' value, create standart input to manually set the number  */}
-          <SelectForForm
-            value={numGuests ? numGuests : 'Input number of guests'}
+        <FormRow id='paid-select' label='Did the client pay for the booking?'>
+          <SelectForForm 
+            id='paid-select'
             onChange={(e) => {
-              const selected = e.target.value;
-              setNumGuests(selected);
-            }}>
-              {currCabin && capacityRange.map((num) => (
-                <option value={num} name={num} key={num}>{num}</option>
-              ))}
-          </SelectForForm>
-        </FormRow>
-
-        <FormRow id='breakfast' label='Does booking include breakfast?'>
-          <SelectForForm onChange={(e) => {
-            let selected = e.target.value;
-            selected = selected === 'yesBreakfast' ? true : false;
-            setHasBreakfast(selected);
-          }}>
-            <option value='yesBreakfast'>Yes</option>  
-            <option value='noBreakfast'>No</option>  
-          </SelectForForm>
-        </FormRow>
-
-        <FormRow id='paid' label='Did the client pay for the booking?'>
-          <SelectForForm onChange={(e) => {
-            let selected = e.target.value;
-            selected = selected === 'hasPaid' ? true : false;
-            setHasPaid(selected);
-
-            if (selected === 'notPaid') {
-              setStatus('unconfirmed');
-            }
-          }}>
+              let selected = e.target.value;
+              selected = selected === 'isPaid' ? true : false;
+              setIsPaid(selected);
+              if (selected === 'notPaid') setStatus('unconfirmed');
+            }}
+          >
             <option value='notPaid'>No</option>  
-            <option value='hasPaid'>Yes</option>  
+            <option value='isPaid'>Yes</option>  
           </SelectForForm>
         </FormRow>
 
-        <FormRow id='bookStatus' label='Booking status:'>
-          <SelectForForm $status={status} onChange={(e) => {
-            let selected = e.target.value;
-            setStatus(selected);
-          }}>
-            <option style={{ color: 'var(--color-blue-700)', backgroundColor: 'var(--color-blue-100' }} value='unconfirmed'>Unconfirmed</option>  
-            {hasPaid === 'hasPaid' && 
+        <FormRow id='status-select' label='Booking status:'>
+          <SelectForForm
+            $status={status}
+            id='status-select'
+            onChange={(e) => {
+              let selected = e.target.value;
+              setStatus(selected);
+            }}
+          >
+            <option
+              style={{ color: 'var(--color-blue-700)', backgroundColor: 'var(--color-blue-100' }} 
+              value='unconfirmed'
+            >
+              Unconfirmed
+            </option>  
+            {isPaid === 'isPaid' && 
               <>
-                <option style={{ color: 'var(--color-green-700)', backgroundColor: 'var(--color-green-100' }} value='checked-in'>Checked-in</option>  
-                <option style={{ color: 'var(--color-silver-700)', backgroundColor: 'var(--color-silver-100' }} value='checked-out'>Checked-out</option>
+                <option
+                  style={{ color: 'var(--color-green-700)', backgroundColor: 'var(--color-green-100' }} 
+                  value='checked-in'
+                >
+                  Checked-in
+                </option>  
+                <option
+                  style={{ color: 'var(--color-silver-700)', backgroundColor: 'var(--color-silver-100' }} 
+                  value='checked-out'
+                >
+                  Checked-out
+                </option>
               </>
             }  
           </SelectForForm>
         </FormRow>
         
-        <FormRow id='addInfo' label='Additional info:'>
-          <Textarea />
+        <FormRow id='additional-info' label='Additional info:'>
+          <Textarea
+            ref={observationRef}
+            id='additional-info' />
         </FormRow>
 
-        <FormRow id='summary' label='Summary:'>
-          <div style={{display: 'flex', gap: '1rem', flexDirection: 'column', justifyContent: 'center', fontSize: '1.6rem'}}> 
+        <FormRow is='summary' descr='Summary:'>
+          <div id='summary' style={{display: 'flex', gap: '1rem', flexDirection: 'column', justifyContent: 'center', fontSize: '1.6rem'}}> 
             <p>
               Cabin <span style={{ fontWeight: '500' }}>
                 {currCabin?.name}
               </span> price for <span style={{ fontWeight: '500' }}>
-                {numberOfNights}
+                {numNights}
               </span> nights: <span style={{ fontWeight: '500' }}>
-                {formatCurrency(currCabin?.regularPrice * numberOfNights)}
+                {formatCurrency(currCabin?.regularPrice * numNights)}
               </span>
             </p>
             <p>
               Breakfast price: <span style={{ fontWeight: '500' }}>
-                {hasBreakfast ? formatCurrency((numberOfNights * numGuests) * settings?.breakfastPrice) : '-'}
+                {hasBreakfast ? formatCurrency((numNights * numGuests) * settings?.breakfastPrice) : '-'}
               </span>
             </p>   
             <p>
               Total price: <span style={{ fontWeight: '500' }}>
                 {hasBreakfast 
-                  ? formatCurrency((currCabin?.regularPrice * numberOfNights) + ((numberOfNights * numGuests) * settings?.breakfastPrice)) 
-                  : formatCurrency(currCabin?.regularPrice * numberOfNights)
+                  ? formatCurrency((currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice)) 
+                  : formatCurrency(currCabin?.regularPrice * numNights)
                 }
               </span>
-            </p>    
+            </p>
+             
+            <div style={{ fontSize: '1.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <p>Confirm form data:</p>
+              <Checkbox
+                id='confirm-form-data' 
+                checked={confirmForm}
+                onChange={() => setConfirmForm((confirm) => !confirm)}
+              />
+            </div>
           </div>
         </FormRow>
 
-        <FormRow id='control-btns'>
+        <FormRow id='form-actions'>
           {/* type is an HTML attribute! */}
           <Button
             $variation='secondary'
@@ -270,8 +379,11 @@ function CreateBookingForm({ onCloseModal }) {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmitGuest, /* onError */)} type={onCloseModal ? 'modal' : 'regular'}>
-
+    <Form
+      id='createGuest'
+      onSubmit={handleSubmit(onSubmitGuest, /* onError */)}
+      $type={onCloseModal ? 'modal' : 'regular'}
+    >
       <FormRow label='Guest full name' error={errors?.fullName?.message}>
         <Input
           type='text'

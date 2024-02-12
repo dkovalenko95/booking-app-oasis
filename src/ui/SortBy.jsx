@@ -12,6 +12,7 @@ function SortBy({ options }) {
 
   return (
     <Select
+      id='sort-bookings'
       $type='white'
       options={options}
       currActiveValue={sortBy}

@@ -16,6 +16,20 @@ import { PAGE_CAPACITY } from '../utils/constants';
 //   return countriesWithFlags;
 // };
 
+// TODO: Extract guest logic to separate service file -> get Guest by ID of getAllGuests
+export async function getGuests() {
+  const { data, error } = await supabase
+    .from('Guests')
+    .select('*')
+
+  if (error) {
+    console.error(error);
+    throw new Error('Cabins could not be loaded')
+  };
+
+  return data;
+};
+
 export async function createGuest(guestData) {
   const { error } = await supabase
     .from('Guests')
@@ -42,6 +56,8 @@ export async function createGuest(guestData) {
 
   // return data;
 };
+
+
 
 export async function createBooking(bookingData) {
   const { error } = await supabase
