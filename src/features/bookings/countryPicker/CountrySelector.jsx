@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { COUNTRIES } from './countries';
 import { StyledContainer, StyledToggleSelectorBtn, StyledCurrentValue, StyledSearchInputContainer, StyledImage, StyledSelectArrows, StyledSvg, StyledSearchInput, StyledSelectedIndicator, StyledInputsContainer, StyledLi, StyledScrollableUl } from './CountryPicker.styled';
 
-export default function CountrySelector({ id, open, onToggle, countries, country, setCountry }) {
+export default function CountrySelector({ id, open, onToggle, countries, country, setCountry, disabledCondition }) {
   const ref = useRef(null);
 
   let selectedValue = null;
@@ -34,6 +34,7 @@ export default function CountrySelector({ id, open, onToggle, countries, country
     <div ref={ref}>
       <StyledContainer>
         <StyledToggleSelectorBtn
+          disabled={disabledCondition}
           onClick={onToggle}
           aria-haspopup='listbox'
           aria-expanded='true'
@@ -69,6 +70,7 @@ export default function CountrySelector({ id, open, onToggle, countries, country
           <StyledInputsContainer>
             <StyledSearchInputContainer>
                 <StyledSearchInput
+                  id='country-input'
                   type='search'
                   name='search'
                   autoComplete='off'

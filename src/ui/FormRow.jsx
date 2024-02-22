@@ -31,7 +31,7 @@ const StyledFormRow = styled.div`
 
   /* Special treatment if the row contains buttons, and if it's NOT a vertical row */
   ${(props) =>
-    props.$orientation !== 'vertical' && props.$orientation !== 'selector' &&
+    props.$orientation !== 'vertical' && props.$orientation !== 'selector' && props.$orientation !== 'reset-cancel-form' &&
     css`
       &:has(button) {
         display: flex;
@@ -46,6 +46,14 @@ const StyledFormRow = styled.div`
       display: grid;
       align-items: center;
     `}
+  
+  ${(props) =>
+    props.$orientation === 'reset-cancel-form' &&
+    css`
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    `}
 `;
 
 const Label = styled.label`
@@ -58,15 +66,23 @@ const Desrc = styled.p`
 `;
 
 const Error = styled.span`
-  font-size: 1.4rem;
+  /* font-size: 1.4rem; */
+  font-size: 1.3rem;
   color: var(--color-red-700);
 `;
 
-function FormRow({ id, descr, label, error, children, orientation, info }) {
+const Hint = styled.span`
+  color: var(--color-grey-400);
+  font-style: italic;
+  font-size: 1.2rem;
+  margin-left: 1rem;
+`;
+
+function FormRow({ id, descr, label, error, children, orientation, hint, info }) {
   return (
     <StyledFormRow $orientation={orientation}>
-      {label && <Label title={info} htmlFor={id}>{label}</Label>}
-      {descr && <Desrc>{descr}</Desrc>}
+      {label && <Label title={info} htmlFor={id}>{label}{hint && <Hint>({hint})</Hint>}</Label>}
+      {descr && <Desrc>{descr}{hint && <Hint>({hint})</Hint>}</Desrc>}
       {children}
       {error && <Error>{error}</Error>}
     </StyledFormRow>

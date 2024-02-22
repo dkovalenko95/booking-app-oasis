@@ -36,7 +36,11 @@ const StyledSelect = styled.select`
 
 function SelectForForm({ value, onChange, children, ...props }) {
   return (
-    <StyledSelect value={value} onChange={onChange} {...props}>
+    <StyledSelect
+      value={value}
+      onChange={onChange}
+      {...props}
+    >
       { children }
     </StyledSelect>
   );

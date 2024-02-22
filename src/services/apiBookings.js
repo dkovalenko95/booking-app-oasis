@@ -57,8 +57,6 @@ export async function createGuest(guestData) {
   // return data;
 };
 
-
-
 export async function createBooking(bookingData) {
   const { error } = await supabase
     .from('Bookings')

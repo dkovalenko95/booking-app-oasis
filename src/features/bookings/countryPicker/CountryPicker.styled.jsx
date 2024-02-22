@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const StyledContainer = styled.div`
   /* margin-top: 1rem; */
@@ -20,6 +20,12 @@ export const StyledToggleSelectorBtn = styled.button`
   border-radius: var(--border-radius-sm);
   padding: 0.8rem 1.2rem;
   box-shadow: var(--shadow-sm);
+
+  ${(props) => props.disabled &&
+    css`
+      color: var(--color-grey-400);
+    `
+  }
 `;
 
 export const StyledCurrentValue = styled.div`

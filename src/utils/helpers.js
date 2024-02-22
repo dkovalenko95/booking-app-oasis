@@ -28,3 +28,26 @@ export const formatCurrency = (value) =>
   new Intl.NumberFormat('en', { style: 'currency', currency: 'USD' }).format(
     value
   );
+
+export function formatDateToString(dateString) {
+  const dateObject = new Date(dateString);
+  const year = dateObject.getFullYear();
+  const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Month is zero-based, so adding 1
+  const day = String(dateObject.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day} 00:00:00`;
+  return formattedDate;
+};
+
+// While creating new booking used to get guest id for booking-guest table relation
+export function getCurrGuestId(curr, arr) {
+  const currGuest = arr.find((person) => person.fullName === curr.fullName);
+  // console.log('Current guest -> id:', currGuest);
+  return +currGuest.id;
+};
+
+// Used to get guest data object after select guest for new created booking
+export function getSelectedGuestData(name, arr) {
+  const selectedGuest = arr.find((person) => person.fullName === name);
+  // console.log('Selected guest:', selectedGuest);
+  return selectedGuest;
+};

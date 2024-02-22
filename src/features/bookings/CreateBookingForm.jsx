@@ -1,54 +1,49 @@
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { IoIosCheckmarkCircle } from 'react-icons/io';
+
+import DatePicker from 'react-date-picker';
+import 'react-date-picker/dist/DatePicker.css';
+import 'react-calendar/dist/Calendar.css';
+import './datePicker/datePicker.css';
+
+import CountrySelector from './countryPicker/CountrySelector';
+import { COUNTRIES } from './countryPicker/countries';
+
 import Form from '../../ui/Form';
+import FormTitle from '../../ui/FormTitle';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
 import Button from '../../ui/Button';
 import SpinnerMini from '../../ui/SpinnerMini';
 import SelectForForm from '../../ui/SelectForForm';
-import Textarea from '../../ui/Textarea';
-import CountrySelector from './countryPicker/CountrySelector';
-import { COUNTRIES } from './countryPicker/countries';
-import { useCreateGuest } from './hooks/useCreateGuest';
-import { useFetchCabins } from '../cabins/hooks/useFetchCabins';
-import DatePicker from 'react-date-picker';
-import 'react-date-picker/dist/DatePicker.css';
-import 'react-calendar/dist/Calendar.css';
-import './datePicker/datePicker.css';
 import Checkbox from '../../ui/Checkbox';
-import { formatCurrency } from '../../utils/helpers';
-import { useSettings } from '../settings/hooks/useSettings';
+import Textarea from '../../ui/Textarea';
+
+import { useFetchCabins } from '../cabins/hooks/useFetchCabins';
+import { useCreateGuest } from './hooks/useCreateGuest';
 import { useFetchGuests } from './hooks/useFetchGuests';
+import { useSettings } from '../settings/hooks/useSettings';
 
-function formatDate(dateString) {
-  const dateObject = new Date(dateString);
-  const year = dateObject.getFullYear();
-  const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Month is zero-based, so adding 1
-  const day = String(dateObject.getDate()).padStart(2, '0');
-  const formattedDate = `${year}-${month}-${day} 00:00:00`;
-  return formattedDate;
-};
-
-function getCurrtGuestId(curr, arr) {
-  const currGuest = arr.find((person) => person.fullName === curr.fullName);
-  console.log(currGuest);
-  return +currGuest.id;
-};
+import { formatCurrency, formatDateToString, getCurrGuestId, getSelectedGuestData } from '../../utils/helpers';
+import { useCreateBooking } from './hooks/useCreateBooking';
 
 function CreateBookingForm({ onCloseModal }) {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  // RENDER COUNT
+  const renderCount = useRef(0);
+  // Increment the render count on each render
+  renderCount.current += 1;
+  console.log('Render count:', renderCount.current);
+  
+  // useForm
+  const { register, handleSubmit, formState: { errors }, clearErrors, reset } = useForm();
+  // console.log('useForm errors:', errors);
 
-  // Current guest
-  // const [guestIsCreated, setGuestIsCreated] = useState({
-  //   fullName: "John Green",
-  //   email: "new@user.com",
-  //   nationalID: 12345678,
-  //   nationality: "United Kingdom",
-  //   countryFlag: "https://flagcdn.com/gb.svg"
-  // });
+  const [selectedGuest, setSelectedGuest] = useState(null);
+  // console.log('Selected guest:', selectedGuest);
 
-  const [guestIsCreated, setGuestIsCreated] = useState(null);
-  console.log(guestIsCreated);
+  const [createdGuest, setCreatedGuest] = useState(null);
+  // console.log('Guest is created:', createdGuest);
 
   // FORM GUEST(1st step)
   const { createGuest, isCreatingGuest } = useCreateGuest();
@@ -63,6 +58,8 @@ function CreateBookingForm({ onCloseModal }) {
   const { settings, isLoading: isLoadingSettings } = useSettings();
   // Fetch guests
   const { guests, isLoading: isLoadingGuests } = useFetchGuests();
+
+  const { createBooking, isCreatingBooking } = useCreateBooking();
 
   // Date picker
   const [startDate, setStartDate] = useState(new Date());
@@ -90,27 +87,31 @@ function CreateBookingForm({ onCloseModal }) {
 
   // Confirm form data
   const [confirmForm, setConfirmForm] = useState(false);
+  const [confirmHint, setConfirmHint] = useState(false);
+
+  // Set current cabin after fetched
+  useEffect(() => {
+    console.log('EFFECT to set CURR CABIN called...');
+    if (cabins && cabins.length > 0) setCurrCabin(cabins[0]);
+  }, [cabins]);
+
+  // Set max guests capacity for current cabin
+  useEffect(() => {
+    console.log('EFFECT to set NUM GUESTS called...');
+    if (currCabin) setNumGuests(currCabin.maxCapacity);
+  }, [currCabin]);
 
   // Summary
-  // TODO: Workaround to ommit useEffect
+  // TODO: Workaround to ommit useEffect (if possible)
   const [summary, setSummary] = useState(null);
   useEffect(() => {
+    console.log('EFFECT for booking SUMMARY called...');
     setSummary({
       cabinPrice: currCabin?.regularPrice * numNights,
       extrasPrice: (numNights * numGuests) * settings?.breakfastPrice,
       totalPrice: (currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice),
     });
   }, [currCabin, numNights, numGuests, settings]);
-
-  // Set current cabin after fetched
-  useEffect(() => {
-    if (cabins && cabins.length > 0) setCurrCabin(cabins[0]);
-  }, [cabins]);
-
-  // Set max guests capacity for current cabin
-  useEffect(() => {
-    if (currCabin) setNumGuests(currCabin.maxCapacity);
-  }, [currCabin])
   
   // Capacity range for selecting possible number of guest for current cabin 
   let capacityRange;
@@ -119,36 +120,47 @@ function CreateBookingForm({ onCloseModal }) {
 
   // FORM SUBMISSION - 1st step - create new guest
   function onSubmitGuest(data) {
-    // 1st step - create guest data
-    const newGuestData = {
-      ...data,
-      nationality: country.title,
-      countryFlag: `https://flagcdn.com/${country.value.toLowerCase()}.svg`,
+    // ----- Select existed guest -----
+    // console.log('SUBMIT GUEST CALLED', 'Form guest data:', data);
+    if (selectedGuest) {
+      const selectedGuestData = getSelectedGuestData(selectedGuest, guests);
+      setCreatedGuest(selectedGuestData)
     };
-    console.log(newGuestData);
-    setGuestIsCreated(newGuestData);
 
-    // 2nd - step API interaction
-    createGuest({
-      ...newGuestData,
-    }, {
-      onSuccess: () => {
-        reset();
-        setCountry(null);
-        setGuestIsCreated(newGuestData);
-        // onCloseModal?.();
-      }
-    });
+    // ----- Create new guest -----
+    // 1st step - create guest data
+    if (!selectedGuest) {
+      const newGuestData = {
+        ...data,
+        nationality: country ? country.title : '',
+        countryFlag: country ? `https://flagcdn.com/${country.value.toLowerCase()}.svg` : '',
+      };
+      console.log('New guest data:', newGuestData);
+      setCreatedGuest(newGuestData);
+      
+      // 2nd - step API interaction
+      createGuest({
+        ...newGuestData,
+      }, {
+        onSuccess: () => {
+          reset();
+          setCountry(null);
+          // onCloseModal?.();
+        }
+      });
+    }
   };
 
   // FORM SUBMISSION - 2nd step - create new booking
   function onSubmitBooking() {
+    if (!confirmForm) {
+      setConfirmHint(true)
+      return;
+    };
     // 1st step - create booking data
     const newBookingData = {
-      // startDate: startDate,
-      startDate: formatDate(startDate),
-      // endDate: endDate,
-      endDate: formatDate(endDate),
+      startDate: formatDateToString(startDate),
+      endDate: formatDateToString(endDate),
       numNights: +numNights,
       numGuests: +numGuests,
       cabinPrice: +summary?.cabinPrice,
@@ -157,17 +169,24 @@ function CreateBookingForm({ onCloseModal }) {
       status: String(status),
       hasBreakfast: String(hasBreakfast).toUpperCase(),
       isPaid: String(isPaid).toUpperCase(),
-      observation: observationRef.current.value,
+      observations: observationRef.current.value,
       cabinId: +currCabin?.id,
-      guestId: getCurrtGuestId(guestIsCreated, guests),
+      guestId: getCurrGuestId(createdGuest, guests),
     };
-    console.log(newBookingData);
+    console.log('New booking data:', newBookingData);
 
     // 2nd step - API interaction
+    createBooking({
+      ...newBookingData,
+    }, {
+      onSuccess: () => {
+        reset();
+        onCloseModal();
+      }
+    });
   };
 
-  // TODO: Work on 1. select existed guest from data base OR  2.create new one
-  if (guestIsCreated) {
+  if (createdGuest) {
     return (
       <Form
         name='create-booking'
@@ -175,11 +194,12 @@ function CreateBookingForm({ onCloseModal }) {
         onSubmit={handleSubmit(onSubmitBooking, /* onError */)}
         $type={onCloseModal ? 'modal' : 'regular'}
       >
+        <FormTitle>Create new booking</FormTitle>
 
         <FormRow id='guest-select' descr='Creating booking for:'>
-          <div id='guest-select'>
-            <span style={{ fontSize: '1.6rem' }}>{guestIsCreated.fullName}</span>
-            <img style={{ marginLeft: '0.5rem' }} width='20rem' src={guestIsCreated.countryFlag} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '1.6rem' }} id='guest-select'>
+            <span>{createdGuest?.fullName}</span>
+            {createdGuest?.countryFlag && <img width='22rem' src={createdGuest?.countryFlag} />}
           </div>
         </FormRow>
 
@@ -276,7 +296,7 @@ function CreateBookingForm({ onCloseModal }) {
               let selected = e.target.value;
               selected = selected === 'isPaid' ? true : false;
               setIsPaid(selected);
-              if (selected === 'notPaid') setStatus('unconfirmed');
+              if (selected !== isPaid) setStatus('unconfirmed')
             }}
           >
             <option value='notPaid'>No</option>  
@@ -299,7 +319,7 @@ function CreateBookingForm({ onCloseModal }) {
             >
               Unconfirmed
             </option>  
-            {isPaid === 'isPaid' && 
+            {isPaid && 
               <>
                 <option
                   style={{ color: 'var(--color-green-700)', backgroundColor: 'var(--color-green-100' }} 
@@ -354,8 +374,12 @@ function CreateBookingForm({ onCloseModal }) {
               <Checkbox
                 id='confirm-form-data' 
                 checked={confirmForm}
-                onChange={() => setConfirmForm((confirm) => !confirm)}
+                onChange={() => {
+                  setConfirmHint(false);
+                  setConfirmForm((confirm) => !confirm);
+                }}
               />
+              {confirmHint && <p style={{ color: ' #388E3C', fontStyle: 'italic', fontWeight: '500' }}>Confirm form data</p>}
             </div>
           </div>
         </FormRow>
@@ -365,89 +389,129 @@ function CreateBookingForm({ onCloseModal }) {
           <Button
             $variation='secondary'
             type='reset'
-            disabled={isCreatingGuest}
+            disabled={isCreatingBooking}
             onClick={() => onCloseModal?.()} // conditional call with optional chaining
           >
             Cancel
           </Button>
-          <Button disabled={isCreatingGuest}>
-            Create booking
+          <Button disabled={isCreatingBooking}>
+            {isCreatingBooking ? <SpinnerMini /> : 'Create booking'} 
           </Button>
         </FormRow>
       </Form>
     );
   };
 
+  console.log('-----END OF COMP CYCLE -> RENDER MARKUP-----');
+
   return (
     <Form
-      id='createGuest'
+      id='create-guest'
       onSubmit={handleSubmit(onSubmitGuest, /* onError */)}
       $type={onCloseModal ? 'modal' : 'regular'}
     >
-      <FormRow label='Guest full name' error={errors?.fullName?.message}>
+      <FormTitle>Select existed guest OR create the new one</FormTitle>
+      <FormRow label='Select existed guest:' error={errors?.selectedGuest?.message}>
+        {isLoadingGuests
+          ? <SpinnerMini />
+          : <>
+              <SelectForForm
+                id='guest-select-input'
+                onChange={(e) => {
+                  const selected = e.target.value;
+                  setSelectedGuest(selected);
+                  clearErrors();
+                }}
+              >
+                <option value='' hidden>Select the guest...</option>
+                {guests.map((guest) => (
+                  <option key={guest.id} value={guest.fullName}>{guest.fullName}</option>
+                ))}
+              </SelectForForm>
+              {selectedGuest && <IoIosCheckmarkCircle color='green' size={24} />}
+            </>
+        }
+      </FormRow>
+      
+      <FormRow id='full-name' label='Guest full name:' error={errors?.fullName?.message}>
         <Input
           type='text'
-          id='fullName'
-          disabled={isCreatingGuest}
-          {...register('fullName', {
-            required: 'This field is required'
-          })}
+          id='full-name'
+          disabled={isCreatingGuest || selectedGuest}
+          {...!selectedGuest && {...register('fullName',
+            {
+              required: 'This field is required if no guest selected',
+            }
+          )}}
         />
       </FormRow>
 
-      <FormRow label='Guest email' error={errors?.email?.message}>
+      <FormRow id='email' label='Guest email:' error={errors?.email?.message}>
         <Input
+          autoComplete='off'
           type='email'
           id='email'
-          disabled={isCreatingGuest}
-          {...register('email', {
-            required: 'This field is required',
-            pattern: {
-              value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-              message: 'Invalid email address',
-            },
-          })}
+          disabled={isCreatingGuest || selectedGuest}
+          {...!selectedGuest && {...register('email', 
+            {
+              required: 'This field is required if no guest selected',
+              pattern: {
+                value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                message: 'Invalid email address',
+              },
+            }
+          )}}
         />
       </FormRow>
 
-      <FormRow label='Guest nationality' orientation='selector'>
+      <FormRow label='Guest nationality:' hint='optional' orientation='selector'>
         <CountrySelector
-          register={register}
           id='country-selector'
           open={isOpen}
           onToggle={() => setIsOpen(!isOpen)}
           countries={COUNTRIES}
           country={country}
           setCountry={setCountry}
+          disabledCondition={isCreatingGuest || selectedGuest}
         />
       </FormRow>
 
-      <FormRow label='National ID' error={errors?.nationalID?.message}>
+      <FormRow id='national-id' label='National ID:' hint='optional' error={errors?.nationalID?.message}>
         <Input
           type='text'
-          id='nationalID'
-          disabled={isCreatingGuest}
-          {...register('nationalID', {
-            required: 'This field is required',
-          })}
+          id='national-id'
+          disabled={isCreatingGuest || selectedGuest}
+          {...register('nationalID')}
         />
       </FormRow>
 
-      <FormRow>
-        {/* type is an HTML attribute! */}
-        <Button
-          $variation='secondary'
-          type='reset'
-          disabled={isCreatingGuest}
-          onClick={() => onCloseModal?.()} // conditional call with optional chaining
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={isCreatingGuest}
-        >
-          Create booking
-        </Button>
+      <FormRow orientation='reset-cancel-form'>
+        <div>
+          <Button
+            $variation='secondary'
+            type='reset'
+            disabled={isCreatingGuest}
+            onClick={() => {
+              setSelectedGuest(null);
+              clearErrors();
+            }}
+          >
+            Reset form
+          </Button>
+        </div>
+        <div style={{ display: 'flex', gap: '1.2rem' }}>
+          <Button
+            $variation='secondary'
+            type='reset'
+            disabled={isCreatingGuest}
+            onClick={() => onCloseModal?.()} // conditional call with optional chaining
+          >
+            Cancel
+          </Button>
+          <Button disabled={isCreatingGuest}>
+            {isCreatingGuest ? <SpinnerMini /> : 'Confirm guest'}
+          </Button>
+        </div>
       </FormRow>
     </Form>
   );

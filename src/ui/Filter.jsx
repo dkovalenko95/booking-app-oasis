@@ -14,6 +14,7 @@ const StyledFilter = styled.div`
 const FilterButton = styled.button`
   background-color: var(--color-grey-0);
   border: none;
+  width: max-content;
 
   ${(props) =>
     props.$active &&
