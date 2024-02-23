@@ -33,19 +33,21 @@ function CreateBookingForm({ onCloseModal }) {
   const renderCount = useRef(0);
   // Increment the render count on each render
   renderCount.current += 1;
-  console.log('Render count:', renderCount.current);
+  console.log('Render count BOOKING FORM:', renderCount.current);
   
   // useForm
   const { register, handleSubmit, formState: { errors }, clearErrors, reset } = useForm();
-  // console.log('useForm errors:', errors);
 
+  // Selected
   const [selectedGuest, setSelectedGuest] = useState(null);
-  // console.log('Selected guest:', selectedGuest);
 
+  // Confirm selected/create guest for booking form
   const [createdGuest, setCreatedGuest] = useState(null);
-  // console.log('Guest is created:', createdGuest);
 
   // FORM GUEST(1st step)
+  // Fetch guests
+  const { guests, isLoading: isLoadingGuests } = useFetchGuests();
+  // Create guest
   const { createGuest, isCreatingGuest } = useCreateGuest();
   // Country picker
   const [country, setCountry] = useState(null);
@@ -54,10 +56,8 @@ function CreateBookingForm({ onCloseModal }) {
   // FORM BOOKING(2nd step)
   // Fetch cabins
   const { cabins, isLoading: isLoadingCabins } = useFetchCabins();
-  // Fetch settings
+  // Fetch settings(breakfasr price)
   const { settings, isLoading: isLoadingSettings } = useSettings();
-  // Fetch guests
-  const { guests, isLoading: isLoadingGuests } = useFetchGuests();
 
   const { createBooking, isCreatingBooking } = useCreateBooking();
 
@@ -87,6 +87,7 @@ function CreateBookingForm({ onCloseModal }) {
 
   // Confirm form data
   const [confirmForm, setConfirmForm] = useState(false);
+  // Hint for confirmation
   const [confirmHint, setConfirmHint] = useState(false);
 
   // Set current cabin after fetched
@@ -102,7 +103,6 @@ function CreateBookingForm({ onCloseModal }) {
   }, [currCabin]);
 
   // Summary
-  // TODO: Workaround to ommit useEffect (if possible)
   const [summary, setSummary] = useState(null);
   useEffect(() => {
     console.log('EFFECT for booking SUMMARY called...');
@@ -118,17 +118,16 @@ function CreateBookingForm({ onCloseModal }) {
   if (currCabin !== null) capacityRange = [...Array(currCabin.maxCapacity).keys()].map((num) => num + 1);
 
 
-  // FORM SUBMISSION - 1st step - create new guest
+  // FORM SUBMISSION - 1st step - create/select new guest
   function onSubmitGuest(data) {
     // ----- Select existed guest -----
-    // console.log('SUBMIT GUEST CALLED', 'Form guest data:', data);
     if (selectedGuest) {
       const selectedGuestData = getSelectedGuestData(selectedGuest, guests);
       setCreatedGuest(selectedGuestData)
     };
 
     // ----- Create new guest -----
-    // 1st step - create guest data
+    // 1) create guest data
     if (!selectedGuest) {
       const newGuestData = {
         ...data,
@@ -138,7 +137,7 @@ function CreateBookingForm({ onCloseModal }) {
       console.log('New guest data:', newGuestData);
       setCreatedGuest(newGuestData);
       
-      // 2nd - step API interaction
+      // 2) API interaction
       createGuest({
         ...newGuestData,
       }, {
@@ -157,7 +156,7 @@ function CreateBookingForm({ onCloseModal }) {
       setConfirmHint(true)
       return;
     };
-    // 1st step - create booking data
+    // 1) create booking data
     const newBookingData = {
       startDate: formatDateToString(startDate),
       endDate: formatDateToString(endDate),
@@ -175,7 +174,7 @@ function CreateBookingForm({ onCloseModal }) {
     };
     console.log('New booking data:', newBookingData);
 
-    // 2nd step - API interaction
+    // 2) API interaction
     createBooking({
       ...newBookingData,
     }, {
@@ -379,7 +378,7 @@ function CreateBookingForm({ onCloseModal }) {
                   setConfirmForm((confirm) => !confirm);
                 }}
               />
-              {confirmHint && <p style={{ color: ' #388E3C', fontStyle: 'italic', fontWeight: '500' }}>Confirm form data</p>}
+              {confirmHint && <p style={{ color: ' rgb(34, 197, 94)', fontStyle: 'italic', fontWeight: '500' }}>Confirm form data</p>}
             </div>
           </div>
         </FormRow>
