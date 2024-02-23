@@ -75,13 +75,13 @@ const Hint = styled.span`
   color: var(--color-grey-400);
   font-style: italic;
   font-size: 1.2rem;
-  margin-left: 1rem;
+  margin-left: 0.8rem;
 `;
 
-function FormRow({ id, descr, label, error, children, orientation, hint, info }) {
+function FormRow({ id, descr, label, error, children, orientation, hint, title }) {
   return (
     <StyledFormRow $orientation={orientation}>
-      {label && <Label title={info} htmlFor={id}>{label}{hint && <Hint>({hint})</Hint>}</Label>}
+      {label && <Label title={title} htmlFor={id}>{label}{hint && <Hint>({hint})</Hint>}</Label>}
       {descr && <Desrc>{descr}{hint && <Hint>({hint})</Hint>}</Desrc>}
       {children}
       {error && <Error>{error}</Error>}

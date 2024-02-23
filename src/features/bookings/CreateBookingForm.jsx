@@ -16,12 +16,12 @@ import Checkbox from '../../ui/Checkbox';
 import Textarea from '../../ui/Textarea';
 
 import { useFetchCabins } from '../cabins/hooks/useFetchCabins';
-
+import { useCreateBooking } from './hooks/useCreateBooking';
 import { useSettings } from '../settings/hooks/useSettings';
+import { useFetchGuests } from './hooks/useFetchGuests';
 
 import { formatCurrency, formatDateToString, getCurrGuestId } from '../../utils/helpers';
-import { useCreateBooking } from './hooks/useCreateBooking';
-import { useFetchGuests } from './hooks/useFetchGuests';
+import DottedLoader from '../../ui/DottedLoader';
 
 function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) {
   // RENDER COUNT
@@ -154,23 +154,23 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         </div>
       </FormRow>
 
+      <FormRow /* id='cabin-select' */ label='Choose the cabin:'>
         {isLoadingCabins
-          ? <SpinnerMini />
-          : <FormRow id='cabin-select' label='Choose the cabin:'>
-              <SelectForForm
-                id='cabin-select'
-                onChange={(e) => {
-                  const cabinNum = e.target.value;
-                  const selectedCabin = cabins.find((cabin) => cabin.name === cabinNum);
-                  setCurrCabin(selectedCabin);
-                }}
-              >
-                {cabins.map((cabin) => (
-                  <option key={cabin.id} value={cabin.name}>{cabin.name}</option>
-                ))}  
-              </SelectForForm>
-            </FormRow>
+          ? <DottedLoader /> 
+          : <SelectForForm
+              id='cabin-select'
+              onChange={(e) => {
+                const cabinNum = e.target.value;
+                const selectedCabin = cabins.find((cabin) => cabin.name === cabinNum);
+                setCurrCabin(selectedCabin);
+              }}
+            >
+              {cabins.map((cabin) => (
+                <option key={cabin.id} value={cabin.name}>{cabin.name}</option>
+              ))}  
+            </SelectForForm>
         }
+        </FormRow>
 
       <FormRow
         id='date-start-select'
@@ -201,32 +201,32 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         <p style={{ fontSize: '1.6rem', paddingLeft: '1.6rem' }}>{numNights}</p>
       </FormRow>
 
+      <FormRow /* id='num-guests-select' */ label='Number of guests:'>
         {isLoadingCabins
-          ? <SpinnerMini />
-          : <FormRow id='num-guests-select' label='Number of guests:'>
-              <SelectForForm
-                id='num-guests-select'
-                value={numGuests ?? 'Select number of guests'}
-                onChange={(e) => {
-                  const selected = e.target.value;
-                  setNumGuests(selected);
-                }}
-              >
-                {currCabin && capacityRange.map((num) => (
-                  <option value={num} name={num} key={num}>{num}</option>
-                ))}
-              </SelectForForm>
-            </FormRow>
+          ? <DottedLoader />
+          :  <SelectForForm
+              id='num-guests-select'
+              value={numGuests ?? 'Select number of guests'}
+              onChange={(e) => {
+                const selected = e.target.value;
+                setNumGuests(selected);
+              }}
+            >
+              {currCabin && capacityRange.map((num) => (
+                <option value={num} name={num} key={num}>{num}</option>
+              ))}
+            </SelectForForm>
         }
+      </FormRow>
 
-      {isLoadingSettings
-        ? <SpinnerMini />
-        : <FormRow
-            id='breakfast-select'
-            label='Does booking include breakfast?'
-            info={`Breakfast price for 1 person is ${formatCurrency(settings?.breakfastPrice)}`}
-          >
-            <SelectForForm
+      <FormRow
+        /* id='breakfast-select' */
+        label='Does booking include breakfast?'
+        title={`Breakfast price for 1 person is ${formatCurrency(settings?.breakfastPrice)}`}
+      >
+        {isLoadingSettings
+          ? <DottedLoader />
+          : <SelectForForm
               id='breakfast-select'
               onChange={(e) => {
                 let selected = e.target.value;
@@ -237,8 +237,8 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
               <option value='yesBreakfast'>Yes</option>  
               <option value='noBreakfast'>No</option>  
             </SelectForForm>
-          </FormRow>
-      }
+        }
+      </FormRow>
 
       <FormRow id='paid-select' label='Did the client pay for the booking?'>
         <SelectForForm 
@@ -345,7 +345,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
               setCreatedGuestData(null);
             }}
           >
-            Back
+            Back to guest
           </Button>
         </div>
         <div style={{ display: 'flex', gap: '1.2rem' }}>

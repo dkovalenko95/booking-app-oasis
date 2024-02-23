@@ -17,6 +17,7 @@ import Form from '../../ui/Form';
 import { useCreateGuest } from './hooks/useCreateGuest';
 import { useFetchGuests } from './hooks/useFetchGuests';
 import { getSelectedGuestData } from '../../utils/helpers';
+import DottedLoader from '../../ui/DottedLoader';
 
 function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
   // RENDER COUNT
@@ -81,9 +82,9 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
       $type={onCloseModal ? 'modal' : 'regular'}
     >
       <FormTitle>Select existed guest OR create the new one</FormTitle>
-      <FormRow label='Select existed guest:' error={errors?.selectedGuest?.message}>
+      <FormRow /* id='guest-select-input' */ label='Select existed guest:' error={errors?.selectedGuest?.message}>
         {isLoadingGuests
-          ? <SpinnerMini />
+          ? <DottedLoader />
           : <>
               <SelectForForm
                 id='guest-select-input'
@@ -134,7 +135,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
         />
       </FormRow>
 
-      <FormRow label='Guest nationality:' hint='optional' orientation='selector'>
+      <FormRow /* id='country-selector' */ label='Guest nationality:' hint='optional' orientation='selector'>
         <CountrySelector
           id='country-selector'
           open={isOpen}
