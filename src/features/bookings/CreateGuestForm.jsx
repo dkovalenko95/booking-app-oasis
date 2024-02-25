@@ -156,7 +156,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
         />
       </FormRow>
 
-      <FormRow orientation='reset-cancel-form'>
+      <FormRow orientation='extra-controls'>
         <div>
           <Button
             $variation='secondary'

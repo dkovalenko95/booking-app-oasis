@@ -31,7 +31,7 @@ const StyledFormRow = styled.div`
 
   /* Special treatment if the row contains buttons, and if it's NOT a vertical row */
   ${(props) =>
-    props.$orientation !== 'vertical' && props.$orientation !== 'selector' && props.$orientation !== 'reset-cancel-form' &&
+    props.$orientation !== 'vertical' && props.$orientation !== 'selector' && props.$orientation !== 'extra-controls' &&
     css`
       &:has(button) {
         display: flex;
@@ -48,7 +48,7 @@ const StyledFormRow = styled.div`
     `}
   
   ${(props) =>
-    props.$orientation === 'reset-cancel-form' &&
+    props.$orientation === 'extra-controls' &&
     css`
       display: flex;
       align-items: center;

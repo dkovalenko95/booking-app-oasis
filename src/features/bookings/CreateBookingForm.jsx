@@ -335,7 +335,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         </div>
       </FormRow>
 
-      <FormRow id='form-actions' orientation='reset-cancel-form'>
+      <FormRow id='form-actions' orientation='extra-controls'>
         <div>
           <Button
             $variation='secondary'
