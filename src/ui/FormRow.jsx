@@ -1,19 +1,11 @@
 import styled, { css } from 'styled-components';
-import { MdError } from 'react-icons/md';
 import { devices } from '../utils/devices';
 
 /* gap: ${(props) => (props.$orientation === 'vertical' ? '0.8rem' : '2.4rem')}; */
 /* padding: 1.2rem 0; */
 
-/* ORIENTATIONS */
-/* vertical, horizontal, selector, extra-controls, setting-form-row, cabin-form-row, booking-form-row ... */ 
-// TODO
-// REBUILD THIS COMPONENT - APPLY ANEW IN ALL FORMS ACROSS THE APP
-
 const StyledFormRow = styled.div`
   padding: 1rem 0;
-  /* display: grid; */
-  /* align-items: center; */
 
   /* Vertical */
   ${(props) => 
@@ -66,25 +58,6 @@ const StyledFormRow = styled.div`
         }
       `
   }
-  
-  /* grid-template-columns: ${(props) =>
-    props.$orientation === 'vertical'
-      ? '1fr'
-      : '21rem 2.8fr 1.2fr'
-  };
-  gap: ${(props) => 
-    props.$orientation === 'vertical'
-      ? '0.6rem'
-      : '2.4rem'
-  }; */
-
-  /* Selector */
-  /* grid-template-columns: ${(props) =>
-    props.$orientation === 'selector' && '21rem 3fr 1.2fr'
-  };
-  gap: ${(props) => 
-    (props.$orientation === 'selector' && '2.4rem')
-  }; */
 
   &:first-child {
     padding-top: 0;
@@ -114,14 +87,6 @@ const StyledFormRow = styled.div`
           gap: 1.2rem;
         }
     `}
-
-  /* Selector */
-  /* ${(props) =>
-    props.$orientation === 'selector' &&
-      css`
-        display: grid;
-        align-items: center;
-      `} */
   
   /* Extra controls */
   ${(props) =>
@@ -168,7 +133,6 @@ const Label = styled.label`
   position: relative;
   font-weight: 500;
   display: flex;
-  /* align-items: center; */
   align-items: flex-end;
   justify-content: flex-start;
   gap: 0.2rem;
@@ -200,12 +164,9 @@ const ErrorContainer = styled.div`
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
-  /* justify-content: center; */
-  /* max-height: 4rem; */
 
   & span {
-    display: block;
-    width: max-content;
+    text-align: end;
   }
 
   @media ${devices.xxs} {
@@ -218,20 +179,41 @@ function FormRow({ id, descr, label, error, children, orientation, hint, title }
     <StyledFormRow $orientation={orientation}>
       {orientation === 'vertical' &&
         <HeaderContainer>
-          {label && <Label title={title} htmlFor={id}>{label}{hint && <Hint>({hint})</Hint>}</Label>}
-          {descr && <Desrc>{descr}{hint && <Hint>({hint})</Hint>}</Desrc>}
+          {label && 
+            <Label title={title} htmlFor={id}>
+              {label}{hint && <Hint>({hint})</Hint>}
+            </Label>
+          }
+          {descr &&
+            <Desrc>
+              {descr}{hint && <Hint>({hint})</Hint>}
+            </Desrc>
+          }
           {error && 
             <ErrorContainer>
               <span>{error}</span>
-              <MdError size={16} color='var(--color-red-700)' />
             </ErrorContainer>
           }
         </HeaderContainer>
       }
-      {orientation !== 'vertical' && label && <Label title={title} htmlFor={id}>{label}{hint && <Hint>({hint})</Hint>}</Label>}
-      {descr && <Desrc>{descr}{hint && <Hint>({hint})</Hint>}</Desrc>}
+      {orientation !== 'vertical' && label && 
+        <Label title={title} htmlFor={id}>
+          {label}{hint && <Hint>({hint})</Hint>}
+        </Label>
+      }
+      {orientation !== 'vertical' && descr &&
+        <Desrc>
+          {descr}{hint && <Hint>({hint})</Hint>}
+        </Desrc>
+      }
+
       {children}
-      {orientation !== 'vertical' && error && <ErrorContainer>{error}</ErrorContainer>}
+      
+      {orientation !== 'vertical' && error &&
+        <ErrorContainer>
+          <span>{error}</span>
+        </ErrorContainer>
+      }
     </StyledFormRow>
   );
 }
