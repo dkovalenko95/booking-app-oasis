@@ -10,13 +10,13 @@ const Img = styled.img`
   width: auto;
 `;
 
-function Logo() {
+function Logo({ setOpen }) {
   const { darkMode } = useDarkMode();
 
   const srcLogoPath = darkMode ? '/logo-dark.png' : '/logo-light.png';
 
   return (
-    <StyledLogo>
+    <StyledLogo onClick={() => setOpen(false)}>
       <Img src={srcLogoPath} alt='Logo' />
     </StyledLogo>
   );

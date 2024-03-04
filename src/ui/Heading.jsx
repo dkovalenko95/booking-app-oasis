@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { devices } from '../utils/devices';
 
 // const test = css`
 //   text-align: center;
@@ -11,6 +12,22 @@ const Heading = styled.h1`
     css`
       font-size: 3rem;
       font-weight: 600;
+
+      @media ${devices.xl} {
+        font-size: 2.6rem;
+      }
+
+      @media ${devices.xl} {
+        font-size: 2.5rem;
+      }
+
+      @media ${devices.md} {
+        font-size: 2.4rem;
+      }
+
+      @media ${devices.sm} {
+        font-size: 1.8rem;
+      }
   `}
 
   ${(props) =>
@@ -36,6 +53,14 @@ const Heading = styled.h1`
   `}
     
   line-height: 1.4;
+
+  @media ${devices.lg} {
+    font-size: 2.8rem;
+  }
+
+  @media ${devices.sm} {
+    font-size: 2.4rem;
+  }
 `;
 
 export default Heading;

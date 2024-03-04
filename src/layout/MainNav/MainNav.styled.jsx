@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { devices } from '../../utils/devices';
 
 export const NavList = styled.ul`
   display: flex;
@@ -19,6 +20,10 @@ export const StyledNavLink = styled(NavLink)`
     font-weight: 500;
     padding: 1.2rem 2.4rem;
     transition: all 0.3s;
+
+    @media ${devices.lg} {
+      padding: 1.2rem 1.2rem; 
+    }
   }
 
   /* This works because react-router places the active class on the active NavLink */

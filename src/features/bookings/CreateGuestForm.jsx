@@ -82,7 +82,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
       $type={onCloseModal ? 'modal' : 'regular'}
     >
       <FormTitle>Select existed guest OR create the new one</FormTitle>
-      <FormRow /* id='guest-select-input' */ label='Select existed guest:' error={errors?.selectedGuest?.message}>
+      <FormRow /* id='guest-select-input' */ label='Select existed guest' error={errors?.selectedGuest?.message} orientation='horizontal-selector'>
         {isLoadingGuests
           ? <DottedLoader />
           : <>
@@ -104,20 +104,20 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
         }
       </FormRow>
       
-      <FormRow id='full-name' label='Guest full name:' error={errors?.fullName?.message}>
+      <FormRow id='full-name' label='Guest full name' error={errors?.fullName?.message} orientation='horizontal'>
         <Input
           type='text'
           id='full-name'
           disabled={isCreatingGuest || selectedGuest}
           {...!selectedGuest && {...register('fullName',
             {
-              required: 'This field is required if no guest selected',
+              required: 'Required if no guest selected',
             }
           )}}
         />
       </FormRow>
 
-      <FormRow id='email' label='Guest email:' error={errors?.email?.message}>
+      <FormRow id='email' label='Guest email' error={errors?.email?.message} orientation='horizontal'>
         <Input
           autoComplete='off'
           type='email'
@@ -125,7 +125,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
           disabled={isCreatingGuest || selectedGuest}
           {...!selectedGuest && {...register('email', 
             {
-              required: 'This field is required if no guest selected',
+              required: 'Required if no guest selected',
               pattern: {
                 value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
                 message: 'Invalid email address',
@@ -135,7 +135,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
         />
       </FormRow>
 
-      <FormRow /* id='country-selector' */ label='Guest nationality:' hint='optional' orientation='selector'>
+      <FormRow /* id='country-selector' */ label='Guest nationality' hint='optional' orientation='horizontal-selector'>
         <CountrySelector
           id='country-selector'
           open={isOpen}
@@ -147,7 +147,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
         />
       </FormRow>
 
-      <FormRow id='national-id' label='National ID:' hint='optional' error={errors?.nationalID?.message}>
+      <FormRow id='national-id' label='National ID' hint='optional' error={errors?.nationalID?.message} orientation='horizontal'>
         <Input
           type='text'
           id='national-id'

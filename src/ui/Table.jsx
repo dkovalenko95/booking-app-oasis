@@ -1,13 +1,15 @@
 import { createContext, useContext } from 'react';
 import styled from 'styled-components';
+import { devices } from '../utils/devices';
 
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
-
+  min-width: 68rem;
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
   overflow: hidden;
+
 `;
 
 const CommonRow = styled.div`
@@ -16,6 +18,16 @@ const CommonRow = styled.div`
   column-gap: 2.4rem;
   align-items: center;
   transition: none;
+
+  @media ${devices.xl} {
+    column-gap: 2rem;
+  }
+
+  @media ${devices.lg} {
+    column-gap: 1.2rem;
+
+    grid-template-columns: ${(props) => props.$devices.lg && '0.6fr 1.8fr 2.4fr 10.6rem 1fr 3.2rem'}
+  }
 `;
 
 const StyledHeader = styled(CommonRow)`
@@ -27,6 +39,14 @@ const StyledHeader = styled(CommonRow)`
   letter-spacing: 0.4px;
   font-weight: 600;
   color: var(--color-grey-600);
+
+  @media ${devices.xl} {
+    padding: 1rem 2rem;
+  }
+
+  @media ${devices.lg} {
+    padding: 0.8rem 1.6rem;
+  }
 `;
 
 const StyledBody = styled.section`
@@ -38,6 +58,14 @@ const StyledRow = styled(CommonRow)`
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
+  }
+
+  @media ${devices.xl} {
+    padding: 1rem 2rem;
+  }
+
+  @media ${devices.lg} {
+    padding: 0.8rem 1.6rem;
   }
 `;
 
@@ -75,7 +103,7 @@ function Table({ columns, children }) {
 function Header({ children }) {
   const { columns } = useContext(TableContext);
   return (
-    <StyledHeader role='row' $columns={columns} as='header'>
+    <StyledHeader $devices={devices} role='row' $columns={columns} as='header'>
       { children }
     </StyledHeader>
   );
@@ -84,7 +112,7 @@ function Header({ children }) {
 function Row({ children }) {
   const { columns } = useContext(TableContext);
   return (
-    <StyledRow role='row' $columns={columns}>
+    <StyledRow $devices={devices} role='row' $columns={columns}>
       { children }
     </StyledRow>
   );

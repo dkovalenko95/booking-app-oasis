@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { devices } from '../../utils/devices';
 
 const StyledStat = styled.div`
   /* Box */
@@ -12,6 +13,24 @@ const StyledStat = styled.div`
   grid-template-rows: auto auto;
   column-gap: 1.6rem;
   row-gap: 0.4rem;
+
+  @media ${devices.xl} {
+    padding: 1.2rem;
+    grid-template-columns: 4.8rem 1fr;
+  }
+
+  @media ${devices.lg} {
+    padding: 1rem;
+    grid-template-columns: 4.2rem 1fr;
+  }
+
+  @media ${devices.xs} {
+    padding: 0.8rem;
+  }
+
+  @media ${devices.xxs} {
+    padding: 0.5rem;
+  }
 `;
 
 const Icon = styled.div`
@@ -39,12 +58,36 @@ const Title = styled.h5`
   letter-spacing: 0.4px;
   font-weight: 600;
   color: var(--color-grey-500);
+
+  @media ${devices.xs} {
+    font-size: 1.1rem;
+  }
+
+  @media ${devices.xxs} {
+    font-size: 1rem;
+  }
 `;
 
 const Value = styled.p`
   font-size: 2.4rem;
   line-height: 1;
   font-weight: 500;
+
+  @media ${devices.xl} {
+    font-size: 2.2rem;
+  }
+
+  @media ${devices.lg} {
+    font-size: 2rem;
+  }
+
+  @media ${devices.xs} {
+    font-size: 1.6rem;
+  }
+
+  @media ${devices.xxs} {
+    font-size: 1.4rem;
+  }
 `;
 
 function Stat({ icon, title, value, color }) {

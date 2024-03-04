@@ -23,7 +23,7 @@ function SignupForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <FormRow label='Full name' error={errors?.fullName?.message}>
+      <FormRow label='Full name' error={errors?.fullName?.message} orientation='vertical'>
         <Input
           type='text'
           id='fullName'
@@ -34,7 +34,7 @@ function SignupForm() {
         />
       </FormRow>
 
-      <FormRow label='Email address' error={errors?.email?.message}>
+      <FormRow label='Email address' error={errors?.email?.message} orientation='vertical'>
         <Input
           type='email'
           id='email'
@@ -49,7 +49,7 @@ function SignupForm() {
         />
       </FormRow>
 
-      <FormRow label='Password (min 8 characters)' error={errors?.password?.message}>
+      <FormRow label='Password' hint='min 8 characters' error={errors?.password?.message} orientation='vertical'>
         <Input
           type='password'
           id='password'
@@ -64,7 +64,7 @@ function SignupForm() {
         />
       </FormRow>
 
-      <FormRow label='Repeat password' error={errors?.passwordConfirm?.message}>
+      <FormRow label='Repeat password' error={errors?.passwordConfirm?.message} orientation='vertical'>
         <Input
           type='password'
           id='passwordConfirm'

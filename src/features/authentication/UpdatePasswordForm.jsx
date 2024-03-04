@@ -21,8 +21,10 @@ function UpdatePasswordForm() {
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormRow
-        label='New password (min 8 chars)'
+        label='New password'
         error={errors?.password?.message}
+        hint='min 8 chars'
+        orientation='vertical'
       >
         <Input
           type='password'
@@ -42,6 +44,7 @@ function UpdatePasswordForm() {
       <FormRow
         label='Confirm password'
         error={errors?.passwordConfirm?.message}
+        orientation='vertical'
       >
         <Input
           type='password'

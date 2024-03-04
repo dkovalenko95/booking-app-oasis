@@ -1,12 +1,27 @@
 import styled from 'styled-components';
 import Button from './Button';
 import Heading from './Heading';
+import { devices } from '../utils/devices';
 
 const StyledConfirmDelete = styled.div`
-  width: 40rem;
+  /* width: 40rem; */
+  min-width: 40rem;
+  max-width: 60rem;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+
+  @media ${devices.sm} {
+    min-width: 35rem;
+  }
+
+  @media ${devices.xs} {
+    min-width: 25rem;
+  }
+
+  @media ${devices.xxs} {
+    min-width: 20rem;
+  }
 
   & p {
     color: var(--color-grey-500);

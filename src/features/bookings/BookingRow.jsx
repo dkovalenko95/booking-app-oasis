@@ -8,6 +8,7 @@ import Menus from '../../ui/Menus';
 import { formatCurrency } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
 import { useCheckout } from '../check-in-out/hooks/useCheckout';
+import { devices } from '../../utils/devices';
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -82,7 +83,9 @@ function BookingRow({
         </span>
       </Stacked>
 
-      <Tag $type={statusToTagName[status]}>{status.replace('-', ' ')}</Tag>
+      {/* <TagContainer> */}
+        <Tag $type={statusToTagName[status]}>{status.replace('-', ' ')}</Tag>
+      {/* </TagContainer> */}
 
       <Amount>{formatCurrency(totalPrice)}</Amount>
 

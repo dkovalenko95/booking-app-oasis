@@ -5,6 +5,7 @@ import Row from '../../ui/Row';
 import Spinner from '../../ui/Spinner';
 import { useTodayActivity } from './hooks/useTodayActivity';
 import TodayItem from './TodayItem';
+import { devices } from '../../utils/devices';
 
 const StyledToday = styled.div`
   /* Box */
@@ -18,6 +19,19 @@ const StyledToday = styled.div`
   gap: 2.4rem;
   grid-column: 1 / span 2;
   padding-top: 2.4rem;
+
+  @media ${devices.xxl} {
+    padding: 1.8rem;
+  }
+
+  @media ${devices.xl} {
+    padding: 1.8rem 4.8rem;
+    grid-column: 1 / -1;
+  }
+  
+  @media ${devices.lg} {
+    padding: 1.8rem;
+  }
 `;
 
 const TodayList = styled.ul`

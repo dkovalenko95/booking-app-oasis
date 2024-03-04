@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { devices } from '../utils/devices';
 
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -13,6 +14,15 @@ const StyledSelect = styled.select`
   font-weight: 500;
   box-shadow: var(--shadow-sm);
   width: 100%;
+
+  @media ${devices.xs} {
+    font-size: 1.3rem;
+    max-width: 30rem;
+  }
+
+  @media ${devices.xxs} {
+    max-width: 25rem;
+  }
 `;
 
 function Select({ options, currActiveValue, onChange, ...props }) {

@@ -6,6 +6,7 @@ import Logo from '../ui/Logo';
 import Heading from '../ui/Heading';
 import Spinner from '../ui/Spinner';
 import { useGetUser } from '../features/authentication/hooks/useGetUser';
+import { devices } from '../utils/devices';
 
 const LoginLayout = styled.main`
   min-height: 100vh;
@@ -15,6 +16,18 @@ const LoginLayout = styled.main`
   justify-content: center;
   gap: 3.2rem;
   background-color: var(--color-grey-50);
+
+  @media ${devices.sm} {
+    grid-template-columns: 42rem;
+  }
+
+  @media ${devices.xs} {
+    grid-template-columns: 34rem;
+  }
+
+  @media ${devices.xxs} {
+    grid-template-columns: 30rem;
+  }
 `;
 
 function Login() {

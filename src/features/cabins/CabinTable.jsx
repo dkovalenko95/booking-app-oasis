@@ -34,26 +34,28 @@ function CabinTable() {
   return (
     // Compound Component Pattern
     <Menus>
-      <Table columns='0.6fr 1.8fr 2.2fr 1fr 1fr 1fr'>
-        <Table.Header>
-          <div></div>
-          <div>Cabin</div>
-          <div>Capacity</div>
-          <div>Price</div>
-          <div>Discount</div>
-          <div></div>
-        </Table.Header>
+      <div style={{ overflowX: 'auto' }}>
+        <Table columns='0.6fr 1.8fr 2.2fr 1fr 1fr 1fr'>
+          <Table.Header>
+            <div></div>
+            <div>Cabin</div>
+            <div>Capacity</div>
+            <div>Price</div>
+            <div>Discount</div>
+            <div></div>
+          </Table.Header>
 
-        {/* Render Props Pattern */}
-        <Table.Body
-          // data={cabins}
-          // data={filteredCabins}
-          data={sortedCabins}
-          render={(cabin) => (
-            <CabinRow cabin={cabin} key={cabin.id} />
-            )}
-        />
-      </Table>
+          {/* Render Props Pattern */}
+          <Table.Body
+            // data={cabins}
+            // data={filteredCabins}
+            data={sortedCabins}
+            render={(cabin) => (
+              <CabinRow cabin={cabin} key={cabin.id} />
+              )}
+          />
+        </Table>
+      </div>
     </Menus>
   );
 }

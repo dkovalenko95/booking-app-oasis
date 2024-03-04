@@ -4,14 +4,28 @@ import Heading from '../../ui/Heading';
 import { AreaChart, Area, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { useDarkMode } from '../../context/DarkModeContext';
 import { eachDayOfInterval, format, isSameDay, subDays } from 'date-fns';
+import { devices } from '../../utils/devices';
 
 const StyledSalesChart = styled(DashboardBox)`
   grid-column: 1 / -1;
+  padding: 3.2rem;
 
   /* Hack to change grid line colors */
   & .recharts-cartesian-grid-horizontal line,
   & .recharts-cartesian-grid-vertical line {
     stroke: var(--color-grey-300);
+  }
+
+  @media ${devices.xl} {
+    padding: 2.4rem;
+  }
+
+  @media ${devices.lg} {
+    padding: 1.8rem;
+  }
+
+  @media ${devices.xs} {
+    padding: 1rem;
   }
 `;
 

@@ -147,14 +147,14 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
     >
       <FormTitle>Create new booking</FormTitle>
 
-      <FormRow id='guest-select' descr='Creating booking for:'>
+      <FormRow id='guest-select' descr='Creating booking for:' orientation='horizontal'>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '1.6rem' }} id='guest-select'>
           <span>{createdGuest?.fullName}</span>
           {createdGuest?.countryFlag && <img width='22rem' src={createdGuest?.countryFlag} />}
         </div>
       </FormRow>
 
-      <FormRow /* id='cabin-select' */ label='Choose the cabin:'>
+      <FormRow /* id='cabin-select' */ label='Choose the cabin' orientation='horizontal-selector'>
         {isLoadingCabins
           ? <DottedLoader /> 
           : <SelectForForm
@@ -174,7 +174,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
 
       <FormRow
         id='date-start-select'
-        orientation='selector'
+        orientation='horizontal-selector'
         descr='Start date:'
       >
         <DatePicker
@@ -186,7 +186,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
       </FormRow>
       <FormRow
         id='date-end-select'
-        orientation='selector'
+        orientation='horizontal-selector'
         descr='End date:'
       >
         <DatePicker
@@ -197,11 +197,11 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         />
       </FormRow>
 
-      <FormRow id='num-nights-select' descr='Number of nights:'>
+      <FormRow id='num-nights-select' descr='Number of nights' orientation='horizontal'>
         <p style={{ fontSize: '1.6rem', paddingLeft: '1.6rem' }}>{numNights}</p>
       </FormRow>
 
-      <FormRow /* id='num-guests-select' */ label='Number of guests:'>
+      <FormRow /* id='num-guests-select' */ label='Number of guests' orientation='horizontal-selector'>
         {isLoadingCabins
           ? <DottedLoader />
           :  <SelectForForm
@@ -223,6 +223,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         /* id='breakfast-select' */
         label='Does booking include breakfast?'
         title={`Breakfast price for 1 person is ${formatCurrency(settings?.breakfastPrice)}`}
+        orientation='horizontal-selector'
       >
         {isLoadingSettings
           ? <DottedLoader />
@@ -240,7 +241,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         }
       </FormRow>
 
-      <FormRow id='paid-select' label='Did the client pay for the booking?'>
+      <FormRow id='paid-select' label='Did the client pay for the booking?' orientation='horizontal-selector'>
         <SelectForForm 
           id='paid-select'
           onChange={(e) => {
@@ -255,7 +256,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         </SelectForForm>
       </FormRow>
 
-      <FormRow id='status-select' label='Booking status:'>
+      <FormRow id='status-select' label='Booking status' orientation='horizontal-selector'>
         <SelectForForm
           $status={status}
           id='status-select'
@@ -289,13 +290,13 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         </SelectForForm>
       </FormRow>
       
-      <FormRow id='additional-info' label='Additional info:'>
+      <FormRow id='additional-info' label='Additional info:' orientation='horizontal'>
         <Textarea
           ref={observationRef}
           id='additional-info' />
       </FormRow>
 
-      <FormRow is='summary' descr='Summary:'>
+      <FormRow is='summary' descr='Summary' orientation='horizontal'>
         <div id='summary' style={{display: 'flex', gap: '1rem', flexDirection: 'column', justifyContent: 'center', fontSize: '1.6rem'}}> 
           <p>
             Cabin <span style={{ fontWeight: '500' }}>
@@ -320,7 +321,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
             </span>
           </p>
             
-          <div style={{ fontSize: '1.6rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ fontSize: '1.6rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
             <p>Confirm form data:</p>
             <Checkbox
               id='confirm-form-data' 

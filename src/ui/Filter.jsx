@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { devices } from '../utils/devices';
 
 const StyledFilter = styled.div`
   border: 1px solid var(--color-grey-100);
@@ -8,7 +9,16 @@ const StyledFilter = styled.div`
   border-radius: var(--border-radius-sm);
   padding: 0.4rem;
   display: flex;
+  align-items: center;
   gap: 0.4rem;
+
+  @media ${devices.xxs} {
+    max-width: 25rem;
+    padding: 0.3rem;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 `;
 
 const FilterButton = styled.button`
@@ -33,6 +43,10 @@ const FilterButton = styled.button`
   &:hover:not(:disabled) {
     background-color: var(--color-brand-600);
     color: var(--color-brand-50);
+  }
+
+  @media ${devices.xs} {
+    font-size: 1.3rem;
   }
 `;
 

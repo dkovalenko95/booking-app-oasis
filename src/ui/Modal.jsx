@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { HiXMark } from 'react-icons/hi2';
 import styled from 'styled-components';
 import { useOutsideClick } from '../hooks/useOutsideClick';
+import { devices } from '../utils/devices';
 
 const StyledModal = styled.div`
   position: fixed;
@@ -13,10 +14,10 @@ const StyledModal = styled.div`
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 3.2rem 4rem;
+  /* padding: 3.2rem 4rem; */
+  padding: 3.2rem 3.6rem;
   transition: all 0.5s;
   
-  /* height: 87.5%; */
   max-height: 87.5%;
   overflow-y: auto;
 `;
@@ -41,8 +42,10 @@ const Button = styled.button`
   transform: translateX(0.8rem);
   transition: all 0.2s;
   position: absolute;
-  top: 1.2rem;
-  right: 1.9rem;
+  /* top: 1.2rem; */
+  /* right: 1.9rem; */
+  top: 0.8rem;
+  right: 1.8rem;
 
   &:hover {
     background-color: var(--color-grey-100);

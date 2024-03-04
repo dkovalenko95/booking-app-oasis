@@ -1,1 +1,1 @@
-export const PAGE_CAPACITY = 5;
+export const PAGE_CAPACITY = 10;
