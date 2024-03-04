@@ -17,6 +17,7 @@ import ConfirmDelete from '../../ui/ConfirmDelete';
 import Empty from '../../ui/Empty';
 import ButtonRow from '../../ui/ButtonRow';
 import ConfirmAction from '../../ui/ConfirmAction';
+import { useUnconfirmed } from '../check-in-out/hooks/useUnconfirmed';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -31,6 +32,7 @@ function BookingDetail() {
   const { booking, isLoading } = useFetchBooking();
   const { checkout, isCheckingOut } = useCheckout();
   const { deleteBooking, isDeletingBooking } = useDeleteBooking();
+  const { setUnconfirmed, isSettingUnconfirmed } = useUnconfirmed();
   
   if (isLoading) return <Spinner />;
 
@@ -67,10 +69,36 @@ function BookingDetail() {
               </Button>
             </Modal.Open>
 
+            {status !== 'unconfirmed' &&
+              <Modal.Open opens='unconfirmBooking'>
+                <Button
+                  $variation='secondary'
+                >
+                  Set as unconfirmed
+                </Button>
+              </Modal.Open>
+            }
+
             <Modal.Window name='deleteBooking'>
               <ConfirmDelete
                 resourceName={`#${bookingId} booking`}
                 disabled={isDeletingBooking}
+                onConfirm={() => {
+                  deleteBooking(bookingId);
+                  moveBack();
+                }}
+              />
+            </Modal.Window>
+
+            <Modal.Window onCloseModal name='unconfirmBooking'>
+              <ConfirmAction
+                onCloseModal
+                action='Set as unconfirmed'
+                resourceName={`#${bookingId} booking`}
+                disabled={isSettingUnconfirmed}
+                onConfirm={() => {
+                  setUnconfirmed(bookingId);
+                }}
               />
             </Modal.Window>
           </Modal>

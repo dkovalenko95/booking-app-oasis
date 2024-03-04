@@ -50,7 +50,11 @@ function ConfirmAction({ action, resourceName, onConfirm, disabled, onCloseModal
         </Button>
         <Button
           $variation='primary'
-          onClick={onConfirm}
+          // onClick={onConfirm}
+          onClick={() => {
+            onConfirm();
+            onCloseModal();
+          }}
           disabled={disabled}
         >
           {actionCapitalize}

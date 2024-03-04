@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom';
 import { HiXMark } from 'react-icons/hi2';
 import styled from 'styled-components';
 import { useOutsideClick } from '../hooks/useOutsideClick';
-import { devices } from '../utils/devices';
 
 const StyledModal = styled.div`
   position: fixed;
