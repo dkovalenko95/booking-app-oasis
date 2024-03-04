@@ -22,6 +22,7 @@ import { useFetchGuests } from './hooks/useFetchGuests';
 
 import { formatCurrency, formatDateToString, getCurrGuestId } from '../../utils/helpers';
 import DottedLoader from '../../ui/DottedLoader';
+import ConfirmHint from '../../ui/ConfirmHint';
 
 function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) {
   // RENDER COUNT
@@ -331,7 +332,10 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
                 setConfirmForm((confirm) => !confirm);
               }}
             />
-            {confirmHint && <p style={{ color: '#388E3C', fontStyle: 'italic', fontWeight: '500' }}>Confirm form data</p>}
+            {confirmHint &&
+              // <p style={{ color: '#388E3C', fontStyle: 'italic', fontWeight: '500' }}>Confirm form data</p>
+              <ConfirmHint>Confirm form data</ConfirmHint>
+            }
           </div>
         </div>
       </FormRow>
