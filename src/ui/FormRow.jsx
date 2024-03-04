@@ -167,6 +167,7 @@ const ErrorContainer = styled.div`
 
   & span {
     text-align: end;
+    line-height: 1.2;
   }
 
   @media ${devices.xxs} {

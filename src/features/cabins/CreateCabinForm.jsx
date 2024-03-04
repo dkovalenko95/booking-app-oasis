@@ -4,10 +4,11 @@ import Form from '../../ui/Form';
 import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import Textarea from '../../ui/Textarea';
+import FormTitle from '../../ui/FormTitle';
 import FormRow from '../../ui/FormRow';
+import ButtonGroup from '../../ui/ButtonGroup';
 import { useCreateCabin } from './hooks/useCreateCabin';
 import { useEditCabin } from './hooks/useEditCabin';
-import FormTitle from '../../ui/FormTitle';
 
 function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const { id: editId, ...editValues } = cabinToEdit;
@@ -159,7 +160,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       </FormRow>
 
       <FormRow orientation='extra-controls'>
-        <div>
+        <ButtonGroup>
           <Button
             $variation='secondary'
             disabled={isProcessing}
@@ -168,8 +169,8 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
           >
             Reset form
           </Button>
-        </div>
-        <div style={{ display: 'flex', gap: '1.2rem' }}>
+        </ButtonGroup>
+        <ButtonGroup>
           {/* type is an HTML attribute! */}
           <Button
             $variation='secondary'
@@ -184,7 +185,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
           >
             {isEditSession ? 'Edit cabin' : 'Add cabin'}
           </Button>
-        </div>
+        </ButtonGroup>
       </FormRow>
     </Form>
   );

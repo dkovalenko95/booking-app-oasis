@@ -13,11 +13,12 @@ import Input from '../../ui/Input';
 import SelectForForm from '../../ui/SelectForForm';
 import FormTitle from '../../ui/FormTitle';
 import Form from '../../ui/Form';
+import ButtonGroup from '../../ui/ButtonGroup';
+import DottedLoader from '../../ui/DottedLoader';
 
 import { useCreateGuest } from './hooks/useCreateGuest';
 import { useFetchGuests } from './hooks/useFetchGuests';
 import { getSelectedGuestData } from '../../utils/helpers';
-import DottedLoader from '../../ui/DottedLoader';
 
 function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
   // RENDER COUNT
@@ -157,7 +158,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
       </FormRow>
 
       <FormRow orientation='extra-controls'>
-        <div>
+        <ButtonGroup>
           <Button
             $variation='secondary'
             type='reset'
@@ -169,8 +170,8 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
           >
             Reset form
           </Button>
-        </div>
-        <div style={{ display: 'flex', gap: '1.2rem' }}>
+        </ButtonGroup>
+        <ButtonGroup>
           <Button
             $variation='secondary'
             type='reset'
@@ -182,7 +183,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
           <Button disabled={isCreatingGuest}>
             {isCreatingGuest ? <SpinnerMini /> : 'Confirm guest'}
           </Button>
-        </div>
+        </ButtonGroup>
       </FormRow>
     </Form>
   );

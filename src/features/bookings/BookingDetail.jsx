@@ -15,6 +15,7 @@ import { useDeleteBooking } from './hooks/useDeleteBooking';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Empty from '../../ui/Empty';
+import ButtonRow from '../../ui/ButtonRow';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -54,51 +55,55 @@ function BookingDetail() {
 
       <BookingDataBox booking={booking} />
 
-      <ButtonGroup>
-        <Modal>
-          <Modal.Open opens='deleteBooking'>
+      <ButtonRow>
+        <ButtonGroup>
+          <Modal>
+            <Modal.Open opens='deleteBooking'>
+              <Button
+                $variation='danger'
+              >
+                Delete
+              </Button>
+            </Modal.Open>
+
+            <Modal.Window name='deleteBooking'>
+              <ConfirmDelete
+                resourceName={`#${bookingId} booking`}
+                disabled={isDeletingBooking}
+                onConfirm={() => {
+                  deleteBooking(bookingId, { onSettled: () => navigate(`/bookings`) });
+                }}
+              />
+            </Modal.Window>
+          </Modal>
+        </ButtonGroup>
+        
+        <ButtonGroup>
+          {status === 'unconfirmed' &&
             <Button
-              $variation='danger'
+              onClick={() => navigate(`/checkin/${bookingId}`)}
             >
-              Delete
+              Check in
             </Button>
-          </Modal.Open>
+          }
 
-          <Modal.Window name='deleteBooking'>
-            <ConfirmDelete
-              resourceName={`#${bookingId} booking`}
-              disabled={isDeletingBooking}
-              onConfirm={() => {
-                deleteBooking(bookingId, { onSettled: () => navigate(`/bookings`) });
-              }}
-            />
-          </Modal.Window>
-        </Modal>
+          {status === 'checked-in' &&
+            <Button
+              onClick={() => checkout(bookingId)}
+              disabled={isCheckingOut}
+            >
+              Check out
+            </Button>
+          }
 
-        {status === 'unconfirmed' &&
           <Button
-            onClick={() => navigate(`/checkin/${bookingId}`)}
+            $variation='secondary'
+            onClick={moveBack}
           >
-            Check in
+            Back
           </Button>
-        }
-
-        {status === 'checked-in' &&
-          <Button
-            onClick={() => checkout(bookingId)}
-            disabled={isCheckingOut}
-          >
-            Check out
-          </Button>
-        }
-
-        <Button
-          $variation='secondary'
-          onClick={moveBack}
-        >
-          Back
-        </Button>
-      </ButtonGroup>
+        </ButtonGroup>
+      </ButtonRow>
     </>
   );
 }

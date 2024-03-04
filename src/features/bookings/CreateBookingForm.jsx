@@ -14,6 +14,9 @@ import SpinnerMini from '../../ui/SpinnerMini';
 import SelectForForm from '../../ui/SelectForForm';
 import Checkbox from '../../ui/Checkbox';
 import Textarea from '../../ui/Textarea';
+import DottedLoader from '../../ui/DottedLoader';
+import ConfirmHint from '../../ui/ConfirmHint';
+import ButtonGroup from '../../ui/ButtonGroup';
 
 import { useFetchCabins } from '../cabins/hooks/useFetchCabins';
 import { useCreateBooking } from './hooks/useCreateBooking';
@@ -21,8 +24,6 @@ import { useSettings } from '../settings/hooks/useSettings';
 import { useFetchGuests } from './hooks/useFetchGuests';
 
 import { formatCurrency, formatDateToString, getCurrGuestId } from '../../utils/helpers';
-import DottedLoader from '../../ui/DottedLoader';
-import ConfirmHint from '../../ui/ConfirmHint';
 
 function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) {
   // RENDER COUNT
@@ -333,7 +334,6 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
               }}
             />
             {confirmHint &&
-              // <p style={{ color: '#388E3C', fontStyle: 'italic', fontWeight: '500' }}>Confirm form data</p>
               <ConfirmHint>Confirm form data</ConfirmHint>
             }
           </div>
@@ -341,7 +341,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
       </FormRow>
 
       <FormRow id='form-actions' orientation='extra-controls'>
-        <div>
+        <ButtonGroup>
           <Button
             $variation='secondary'
             disabled={isCreatingBooking}
@@ -352,8 +352,8 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
           >
             Back to guest
           </Button>
-        </div>
-        <div style={{ display: 'flex', gap: '1.2rem' }}>
+        </ButtonGroup>
+        <ButtonGroup>
           {/* type is an HTML attribute! */}
           <Button
             $variation='secondary'
@@ -366,7 +366,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
           <Button disabled={isCreatingBooking}>
             {isCreatingBooking ? <SpinnerMini /> : 'Create booking'} 
           </Button>
-        </div>
+        </ButtonGroup>
       </FormRow>
     </Form>
   );
