@@ -16,6 +16,7 @@ import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Empty from '../../ui/Empty';
 import ButtonRow from '../../ui/ButtonRow';
+import ConfirmAction from '../../ui/ConfirmAction';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -70,9 +71,6 @@ function BookingDetail() {
               <ConfirmDelete
                 resourceName={`#${bookingId} booking`}
                 disabled={isDeletingBooking}
-                onConfirm={() => {
-                  deleteBooking(bookingId, { onSettled: () => navigate(`/bookings`) });
-                }}
               />
             </Modal.Window>
           </Modal>
@@ -88,13 +86,31 @@ function BookingDetail() {
           }
 
           {status === 'checked-in' &&
+            <Modal>
+              <Modal.Open opens='checkoutBooking'>
+                <Button>
+                  Check out
+                </Button>
+              </Modal.Open>
+
+              <Modal.Window name='checkoutBooking'>
+                <ConfirmAction
+                  action='check out'
+                  resourceName={`#${bookingId} booking`}
+                  disabled={isCheckingOut}
+                  onConfirm={() => checkout(bookingId)}
+                />
+              </Modal.Window>
+            </Modal>
+          }
+          {/* {status === 'checked-in' &&
             <Button
               onClick={() => checkout(bookingId)}
               disabled={isCheckingOut}
             >
               Check out
             </Button>
-          }
+          } */}
 
           <Button
             $variation='secondary'

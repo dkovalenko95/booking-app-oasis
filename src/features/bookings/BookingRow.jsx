@@ -5,10 +5,11 @@ import { format, isToday } from 'date-fns';
 import Tag from '../../ui/Tag';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
+import Modal from '../../ui/Modal';
+import ConfirmAction from '../../ui/ConfirmAction';
 import { formatCurrency } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
 import { useCheckout } from '../check-in-out/hooks/useCheckout';
-import { devices } from '../../utils/devices';
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -89,37 +90,49 @@ function BookingRow({
 
       <Amount>{formatCurrency(totalPrice)}</Amount>
 
-      <Menus.Menu>
-        <Menus.Toggle id={bookingId} />
-        <Menus.List id={bookingId}>
-          <Menus.Button
-            icon={<HiEye />}
-            onClick={() => navigate(`/bookings/${bookingId}`)}
-          >
-            See details
-          </Menus.Button>
-          
-          {status === 'unconfirmed' &&
-            <Menus.Button
-              icon={<HiArrowDownOnSquare />}
-              onClick={() => navigate(`/checkin/${bookingId}`)}
-            >
-              Check in
-            </Menus.Button>
-          }
+      <Modal>
+        <Menus.Menu>
+          <Menus.Toggle id={bookingId} />
 
-          {status === 'checked-in' &&
+          <Menus.List id={bookingId}>
             <Menus.Button
-              icon={<HiArrowUpOnSquare />}
-              onClick={() => checkout(bookingId)}
-              disabled={isCheckingOut}
+              icon={<HiEye />}
+              onClick={() => navigate(`/bookings/${bookingId}`)}
             >
-              Check out
+              See details
             </Menus.Button>
-          }
- 
-        </Menus.List>
-      </Menus.Menu>
+            
+            {status === 'unconfirmed' &&
+              <Menus.Button
+                icon={<HiArrowDownOnSquare />}
+                onClick={() => navigate(`/checkin/${bookingId}`)}
+              >
+                Check in
+              </Menus.Button>
+            }
+
+            {status === 'checked-in' &&
+              <Modal.Open opens='checkoutBooking'>
+                <Menus.Button
+                  icon={<HiArrowUpOnSquare />}
+                >
+                  Check out
+                </Menus.Button>
+              </Modal.Open> 
+            }
+          </Menus.List>
+
+          <Modal.Window name='checkoutBooking'>
+            <ConfirmAction
+              action='check out'
+              resourceName={`#${bookingId} booking`}
+              disabled={isCheckingOut}
+              onConfirm={() => checkout(bookingId)}
+            />
+          </Modal.Window>
+
+        </Menus.Menu>
+      </Modal>
     </Table.Row>
   );
 }
