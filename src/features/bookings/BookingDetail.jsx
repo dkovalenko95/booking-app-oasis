@@ -48,7 +48,7 @@ function BookingDetail() {
 
   return (
     <>
-      <Row $type='horizontal'>
+      <Row $type='horizontal' $backNav='back-button'>
         <HeadingGroup>
           <Heading as='h1'>Booking #{bookingId}</Heading>
           <Tag $type={statusToTagName[status]}>{status.replace('-', ' ')}</Tag>
@@ -90,9 +90,8 @@ function BookingDetail() {
               />
             </Modal.Window>
 
-            <Modal.Window onCloseModal name='unconfirmBooking'>
+            <Modal.Window name='unconfirmBooking'>
               <ConfirmAction
-                onCloseModal
                 action='Set as unconfirmed'
                 resourceName={`#${bookingId} booking`}
                 disabled={isSettingUnconfirmed}

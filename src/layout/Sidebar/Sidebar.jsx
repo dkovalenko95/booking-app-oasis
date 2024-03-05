@@ -12,7 +12,7 @@ function Sidebar({ open, setOpen }) {
       <Logo setOpen={setOpen} />
       <MainNav setOpen={setOpen} />
 
-      {/* <Uploader /> */}
+      <Uploader />
     </StyledSidebar>
   );
 }

@@ -36,6 +36,7 @@ const StyledConfirmDelete = styled.div`
 `;
 
 function ConfirmAction({ action, resourceName, onConfirm, disabled, onCloseModal }) {
+  console.log(onConfirm);
   const actionCapitalize = action.charAt(0).toUpperCase() + action.slice(1);
   return (
     <StyledConfirmDelete>
@@ -50,10 +51,9 @@ function ConfirmAction({ action, resourceName, onConfirm, disabled, onCloseModal
         </Button>
         <Button
           $variation='primary'
-          // onClick={onConfirm}
           onClick={() => {
             onConfirm();
-            onCloseModal();
+            onCloseModal?.();
           }}
           disabled={disabled}
         >

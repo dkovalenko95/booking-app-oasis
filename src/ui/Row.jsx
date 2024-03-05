@@ -10,6 +10,13 @@ const Row = styled.div`
     gap: 1.8rem;
     align-items: center;
     justify-content: center;
+
+    ${(props) => 
+      props.$backNav === 'back-button' &&
+      css`
+        flex-flow: column-reverse;
+      `
+    }
   }
 
   ${(props) =>

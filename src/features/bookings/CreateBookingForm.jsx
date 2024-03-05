@@ -134,7 +134,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
     }, {
       onSuccess: () => {
         reset();
-        onCloseModal();
+        onCloseModal()
       }
     });
   };
