@@ -41,13 +41,11 @@ export function formatDateToString(dateString) {
 // While creating new booking used to get guest id for booking-guest table relation
 export function getCurrGuestId(curr, arr) {
   const currGuest = arr.find((person) => person.fullName === curr.fullName);
-  // console.log('Current guest -> id:', currGuest);
   return +currGuest.id;
 };
 
 // Used to get guest data object after select guest for new created booking
 export function getSelectedGuestData(name, arr) {
   const selectedGuest = arr.find((person) => person.fullName === name);
-  // console.log('Selected guest:', selectedGuest);
   return selectedGuest;
 };

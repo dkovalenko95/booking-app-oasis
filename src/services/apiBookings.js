@@ -2,21 +2,6 @@ import { getToday } from '../utils/helpers';
 import supabase from './supabase';
 import { PAGE_CAPACITY } from '../utils/constants';
 
-// export async function getCountriesWithFlags(countriesArray) {
-//   // TODO: Add try/catch
-//   const countriesWithFlags = await Promise.all(countriesArray.map(async(country) => {
-//     const response = await fetch(`https://purecatamphetamine.github.io/country-flag-icons/3x2/${country.value}.svg`);
-//     const flag = response.ok ? response.url : null;
-
-//     return {
-//       ...country,
-//       flag
-//     };
-//   }));
-//   return countriesWithFlags;
-// };
-
-// TODO: Extract guest logic to separate service file -> get Guest by ID of getAllGuests
 export async function getGuests() {
   const { data, error } = await supabase
     .from('Guests')
@@ -39,22 +24,6 @@ export async function createGuest(guestData) {
     console.error(error);
     throw new Error('Guest could not be created')
   };
-
-  // const query = supabase
-    // .from('Guests')
-    // .insert({ ...guestData })
-    // .select()
-
-  // const { data, error } = await query
-    // .select()
-    // .single() // return data as a single object instead of an array of objects
-
-  // if (error) {
-    // console.error(error);
-    // throw new Error('Guest could not be created')
-  // };
-
-  // return data;
 };
 
 export async function createBooking(bookingData) {
