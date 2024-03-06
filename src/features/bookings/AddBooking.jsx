@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import Modal from '../../ui/Modal';
 import Button from '../../ui/Button';
@@ -10,12 +10,6 @@ const AddBookingContainer = styled.div`
 `;
 
 function AddBooking() {
-  // NOTE: RENDER COUNT
-  // const renderCount = useRef(0);
-  // // Increment the render count on each render
-  // renderCount.current += 1;
-  // console.log('Render count ADD BOOKING:', renderCount.current);
-
   // Confirm selected/create guest for booking form
   const [createdGuest, setCreatedGuest] = useState(null);
 

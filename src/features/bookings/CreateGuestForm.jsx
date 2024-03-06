@@ -1,11 +1,8 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-
 import { IoIosCheckmarkCircle } from 'react-icons/io';
-
 import CountrySelector from './countryPicker/CountrySelector';
 import { COUNTRIES } from './countryPicker/countries';
-
 import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
 import FormRow from '../../ui/FormRow';
@@ -15,20 +12,11 @@ import FormTitle from '../../ui/FormTitle';
 import Form from '../../ui/Form';
 import ButtonGroup from '../../ui/ButtonGroup';
 import DottedLoader from '../../ui/DottedLoader';
-
 import { useCreateGuest } from './hooks/useCreateGuest';
 import { useFetchGuests } from './hooks/useFetchGuests';
 import { getSelectedGuestData } from '../../utils/helpers';
 
 function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
-  // NOTE: RENDER COUNT
-  // const renderCount = useRef(0);
-  // // Increment the render count on each render
-  // renderCount.current += 1;
-  // console.log('Render count GUEST FORM:', renderCount.current);
-
-
-
   // useForm
   const { register, handleSubmit, formState: { errors }, clearErrors, reset } = useForm();
 
@@ -60,7 +48,6 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
         nationality: country ? country.title : '',
         countryFlag: country ? `https://flagcdn.com/${country.value.toLowerCase()}.svg` : '',
       };
-      console.log('New guest data:', newGuestData);
       setCreatedGuestData(newGuestData);
       
       // 2) API interaction
@@ -79,11 +66,11 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
   return (
     <Form
       id='create-guest'
-      onSubmit={handleSubmit(onSubmitGuest, /* onError */)}
+      onSubmit={handleSubmit(onSubmitGuest)}
       $type={onCloseModal ? 'modal' : 'regular'}
     >
       <FormTitle>Select existed guest OR create the new one</FormTitle>
-      <FormRow /* id='guest-select-input' */ label='Select existed guest' error={errors?.selectedGuest?.message} orientation='horizontal-selector'>
+      <FormRow label='Select existed guest' error={errors?.selectedGuest?.message} orientation='horizontal-selector'>
         {isLoadingGuests
           ? <DottedLoader />
           : <>
@@ -136,7 +123,7 @@ function CreateGuestForm({ onCloseModal, setCreatedGuestData }) {
         />
       </FormRow>
 
-      <FormRow /* id='country-selector' */ label='Guest nationality' hint='optional' orientation='horizontal-selector'>
+      <FormRow label='Guest nationality' hint='optional' orientation='horizontal-selector'>
         <CountrySelector
           id='country-selector'
           open={isOpen}

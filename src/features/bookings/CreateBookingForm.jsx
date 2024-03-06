@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-
+import styled from 'styled-components';
 import DatePicker from 'react-date-picker';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import './datePicker/datePicker.css';
-
 import Form from '../../ui/Form';
 import FormTitle from '../../ui/FormTitle';
 import FormRow from '../../ui/FormRow';
@@ -17,19 +16,16 @@ import Textarea from '../../ui/Textarea';
 import DottedLoader from '../../ui/DottedLoader';
 import ConfirmHint from '../../ui/ConfirmHint';
 import ButtonGroup from '../../ui/ButtonGroup';
-
-import { useFetchCabins } from '../cabins/hooks/useFetchCabins';
-import { useCreateBooking } from './hooks/useCreateBooking';
-import { useSettings } from '../settings/hooks/useSettings';
-import { useFetchGuests } from './hooks/useFetchGuests';
-
-import { formatCurrency, formatDateToString, getCurrGuestId } from '../../utils/helpers';
 import GuestForForm from '../../ui/GuestForForm';
 import StatusOption from '../../ui/StatusOption';
 import SummaryContainer from '../../ui/SummaryContainer';
 import ConfirmFormContainer from '../../ui/ConfirmFormContainer';
 import SpanMedium from '../../ui/SpanMedium';
-import styled from 'styled-components';
+import { useFetchCabins } from '../cabins/hooks/useFetchCabins';
+import { useCreateBooking } from './hooks/useCreateBooking';
+import { useSettings } from '../settings/hooks/useSettings';
+import { useFetchGuests } from './hooks/useFetchGuests';
+import { formatCurrency, formatDateToString, getCurrGuestId } from '../../utils/helpers';
 
 const NumberNights = styled.p`
   font-size: 1.6rem;
@@ -37,14 +33,6 @@ const NumberNights = styled.p`
 `;
 
 function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) {
-  // NOTE: RENDER COUNT
-  // const renderCount = useRef(0);
-  // // Increment the render count on each render
-  // renderCount.current += 1;
-  // console.log('Render count BOOKING FORM:', renderCount.current);
-  
-
-
   // useForm
   const { handleSubmit, reset } = useForm();
 
@@ -90,20 +78,17 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
 
   // Set current cabin after fetched
   useEffect(() => {
-    console.log('EFFECT to set CURR CABIN called...');
     if (cabins && cabins.length > 0) setCurrCabin(cabins[0]);
   }, [cabins]);
 
   // Set max guests capacity for current cabin
   useEffect(() => {
-    console.log('EFFECT to set NUM GUESTS called...');
     if (currCabin) setNumGuests(currCabin.maxCapacity);
   }, [currCabin]);
 
   // Summary
   const [summary, setSummary] = useState(null);
   useEffect(() => {
-    console.log('EFFECT for booking SUMMARY called...');
     setSummary({
       cabinPrice: currCabin?.regularPrice * numNights,
       extrasPrice: (numNights * numGuests) * settings?.breakfastPrice,
@@ -118,7 +103,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
   // FORM SUBMISSION - 2nd step - create new booking
   function onSubmitBooking() {
     if (!confirmForm) {
-      setConfirmHint(true)
+      setConfirmHint(true);
       return;
     };
     // 1) create booking data
@@ -137,17 +122,16 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
       cabinId: +currCabin?.id,
       guestId: getCurrGuestId(createdGuest, guests),
     };
-    console.log('New booking data:', newBookingData);
 
     // 2) API interaction
-    // createBooking({
-    //   ...newBookingData,
-    // }, {
-    //   onSuccess: () => {
-    //     reset();
-    //     onCloseModal()
-    //   }
-    // });
+    createBooking({
+      ...newBookingData,
+    }, {
+      onSuccess: () => {
+        reset();
+        onCloseModal();
+      },
+    });
   };
 
   
@@ -167,7 +151,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         </GuestForForm>
       </FormRow>
 
-      <FormRow /* id='cabin-select' */ label='Choose the cabin' orientation='horizontal-selector'>
+      <FormRow label='Choose the cabin' orientation='horizontal-selector'>
         {isLoadingCabins
           ? <DottedLoader /> 
           : <SelectForForm
@@ -233,7 +217,6 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
       </FormRow>
 
       <FormRow
-        /* id='breakfast-select' */
         label='Does booking include breakfast?'
         title={`Breakfast price for 1 person is ${formatCurrency(settings?.breakfastPrice)}`}
         orientation='horizontal-selector'
@@ -358,7 +341,6 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
           </Button>
         </ButtonGroup>
         <ButtonGroup>
-          {/* type is an HTML attribute! */}
           <Button
             $variation='secondary'
             type='button'
