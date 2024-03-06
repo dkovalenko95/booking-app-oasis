@@ -24,13 +24,24 @@ import { useSettings } from '../settings/hooks/useSettings';
 import { useFetchGuests } from './hooks/useFetchGuests';
 
 import { formatCurrency, formatDateToString, getCurrGuestId } from '../../utils/helpers';
+import GuestForForm from '../../ui/GuestForForm';
+import StatusOption from '../../ui/StatusOption';
+import SummaryContainer from '../../ui/SummaryContainer';
+import ConfirmFormContainer from '../../ui/ConfirmFormContainer';
+import SpanMedium from '../../ui/SpanMedium';
+import styled from 'styled-components';
+
+const NumberNights = styled.p`
+  font-size: 1.6rem;
+  padding-left: 1.6rem;
+`;
 
 function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) {
-  // RENDER COUNT
-  const renderCount = useRef(0);
-  // Increment the render count on each render
-  renderCount.current += 1;
-  console.log('Render count BOOKING FORM:', renderCount.current);
+  // NOTE: RENDER COUNT
+  // const renderCount = useRef(0);
+  // // Increment the render count on each render
+  // renderCount.current += 1;
+  // console.log('Render count BOOKING FORM:', renderCount.current);
   
 
 
@@ -38,7 +49,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
   const { handleSubmit, reset } = useForm();
 
   // Fetch guests
-  const { guests, isLoading: isLoadingGuests } = useFetchGuests();
+  const { guests } = useFetchGuests();
   
   // FORM BOOKING(2nd step)
   // Fetch cabins
@@ -129,14 +140,14 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
     console.log('New booking data:', newBookingData);
 
     // 2) API interaction
-    createBooking({
-      ...newBookingData,
-    }, {
-      onSuccess: () => {
-        reset();
-        onCloseModal()
-      }
-    });
+    // createBooking({
+    //   ...newBookingData,
+    // }, {
+    //   onSuccess: () => {
+    //     reset();
+    //     onCloseModal()
+    //   }
+    // });
   };
 
   
@@ -144,16 +155,16 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
     <Form
       name='create-booking'
       id='create-booking'
-      onSubmit={handleSubmit(onSubmitBooking, /* onError */)}
+      onSubmit={handleSubmit(onSubmitBooking)}
       $type={onCloseModal ? 'modal' : 'regular'}
     >
       <FormTitle>Create new booking</FormTitle>
 
       <FormRow id='guest-select' descr='Creating booking for:' orientation='horizontal'>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '1.6rem' }} id='guest-select'>
+        <GuestForForm>
           <span>{createdGuest?.fullName}</span>
           {createdGuest?.countryFlag && <img width='22rem' src={createdGuest?.countryFlag} />}
-        </div>
+        </GuestForForm>
       </FormRow>
 
       <FormRow /* id='cabin-select' */ label='Choose the cabin' orientation='horizontal-selector'>
@@ -200,7 +211,7 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
       </FormRow>
 
       <FormRow id='num-nights-select' descr='Number of nights' orientation='horizontal'>
-        <p style={{ fontSize: '1.6rem', paddingLeft: '1.6rem' }}>{numNights}</p>
+        <NumberNights>{numNights}</NumberNights>
       </FormRow>
 
       <FormRow /* id='num-guests-select' */ label='Number of guests' orientation='horizontal-selector'>
@@ -267,63 +278,56 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
             setStatus(selected);
           }}
         >
-          <option
-            style={{ color: 'var(--color-blue-700)', backgroundColor: 'var(--color-blue-100' }} 
-            value='unconfirmed'
-          >
+          <StatusOption $variation='unconfirmed' value='unconfirmed'>
             Unconfirmed
-          </option>  
+          </StatusOption>  
           {isPaid && 
             <>
-              <option
-                style={{ color: 'var(--color-green-700)', backgroundColor: 'var(--color-green-100' }} 
-                value='checked-in'
-              >
+              <StatusOption $variation='checked-in' value='checked-in'>
                 Checked-in
-              </option>  
-              <option
-                style={{ color: 'var(--color-silver-700)', backgroundColor: 'var(--color-silver-100' }} 
-                value='checked-out'
-              >
+              </StatusOption>  
+              <StatusOption $variation='checked-out' value='checked-out'>
                 Checked-out
-              </option>
+              </StatusOption>
             </>
           }  
         </SelectForForm>
       </FormRow>
       
-      <FormRow id='additional-info' label='Additional info:' orientation='horizontal'>
-        <Textarea
-          ref={observationRef}
-          id='additional-info' />
+      <FormRow
+        id='additional-info'
+        label='Additional info'
+        orientation='horizontal'
+      >
+        <Textarea ref={observationRef} id='additional-info' />
       </FormRow>
 
       <FormRow is='summary' descr='Summary' orientation='horizontal'>
-        <div id='summary' style={{display: 'flex', gap: '1rem', flexDirection: 'column', justifyContent: 'center', fontSize: '1.6rem'}}> 
+        <SummaryContainer id='summary'> 
           <p>
-            Cabin <span style={{ fontWeight: '500' }}>
+            Cabin <SpanMedium>
               {currCabin?.name}
-            </span> price for <span style={{ fontWeight: '500' }}>
+            </SpanMedium> price for <SpanMedium>
               {numNights}
-            </span> nights: <span style={{ fontWeight: '500' }}>
+            </SpanMedium> nights: <SpanMedium>
               {formatCurrency(currCabin?.regularPrice * numNights)}
-            </span>
+            </SpanMedium>
           </p>
           <p>
-            Breakfast price: <span style={{ fontWeight: '500' }}>
+            Breakfast price: <SpanMedium>
               {hasBreakfast ? formatCurrency((numNights * numGuests) * settings?.breakfastPrice) : '-'}
-            </span>
+            </SpanMedium>
           </p>   
           <p>
-            Total price: <span style={{ fontWeight: '500' }}>
+            Total price: <SpanMedium>
               {hasBreakfast 
                 ? formatCurrency((currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice)) 
                 : formatCurrency(currCabin?.regularPrice * numNights)
               }
-            </span>
+            </SpanMedium>
           </p>
             
-          <div style={{ fontSize: '1.6rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <ConfirmFormContainer>
             <p>Confirm form data:</p>
             <Checkbox
               id='confirm-form-data' 
@@ -336,8 +340,8 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
             {confirmHint &&
               <ConfirmHint>Confirm form data</ConfirmHint>
             }
-          </div>
-        </div>
+          </ConfirmFormContainer>
+        </SummaryContainer>
       </FormRow>
 
       <FormRow id='form-actions' orientation='extra-controls'>

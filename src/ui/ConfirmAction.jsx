@@ -36,7 +36,6 @@ const StyledConfirmDelete = styled.div`
 `;
 
 function ConfirmAction({ action, resourceName, onConfirm, disabled, onCloseModal }) {
-  console.log(onConfirm);
   const actionCapitalize = action.charAt(0).toUpperCase() + action.slice(1);
   return (
     <StyledConfirmDelete>
