@@ -50,8 +50,6 @@ export async function editBooking(bookingData, id) {
     throw new Error('Booking could not be edited')
   };
 
-  console.log(data);
-
   return data;
 };
 
