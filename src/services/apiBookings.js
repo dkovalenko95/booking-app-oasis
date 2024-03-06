@@ -37,6 +37,24 @@ export async function createBooking(bookingData) {
   };
 };
 
+export async function editBooking(bookingData, id) {
+  const { data, error } = await supabase
+    .from('Bookings')
+    .update({ ...bookingData })
+    .eq('id', id) // update only the row where the field of 'id' equal to 'id' passed in
+    .select()
+    .single() // return data as a single object instead of an array of objects
+
+  if (error) {
+    console.error(error);
+    throw new Error('Booking could not be edited')
+  };
+
+  console.log(data);
+
+  return data;
+};
+
 export async function getBookings({ filter, sortBy, page }) {
   // const { data, error } = await supabase
   let query = supabase
