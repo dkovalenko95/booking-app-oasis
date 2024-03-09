@@ -85,16 +85,6 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
   useEffect(() => {
     if (currCabin) setNumGuests(currCabin.maxCapacity);
   }, [currCabin]);
-
-  // Summary
-  const [summary, setSummary] = useState(null);
-  useEffect(() => {
-    setSummary({
-      cabinPrice: currCabin?.regularPrice * numNights,
-      extrasPrice: (numNights * numGuests) * settings?.breakfastPrice,
-      totalPrice: (currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice),
-    });
-  }, [currCabin, numNights, numGuests, settings]);
   
   // Capacity range for selecting possible number of guest for current cabin 
   let capacityRange;
@@ -112,9 +102,9 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
       endDate: formatDateToString(endDate),
       numNights: +numNights,
       numGuests: +numGuests,
-      cabinPrice: +summary?.cabinPrice,
-      extrasPrice: +summary?.extrasPrice,
-      totalPrice: +summary?.totalPrice,
+      cabinPrice: +currCabin?.regularPrice * numNights,
+      extrasPrice: +(numNights * numGuests) * settings?.breakfastPrice,
+      totalPrice: +(currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice),
       status: String(status),
       hasBreakfast: String(hasBreakfast).toUpperCase(),
       isPaid: String(isPaid).toUpperCase(),
