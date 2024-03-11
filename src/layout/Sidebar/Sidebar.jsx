@@ -1,4 +1,3 @@
-import { Uploader } from '../../data/Uploader';
 import Logo from '../../ui/Logo';
 import MainNav from '../MainNav/MainNav';
 import { StyledSidebar } from './Sidebar.styled';
@@ -11,8 +10,6 @@ function Sidebar({ open, setOpen }) {
     <StyledSidebar ref={ref} open={open}>
       <Logo setOpen={setOpen} />
       <MainNav setOpen={setOpen} />
-
-      {/* <Uploader /> */}
     </StyledSidebar>
   );
 }

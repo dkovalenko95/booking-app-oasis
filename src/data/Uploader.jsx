@@ -6,6 +6,8 @@ import { subtractDates } from '../utils/helpers';
 import { bookings } from './data-bookings';
 import { cabins } from './data-cabins';
 import { guests } from './data-guests';
+import styled from 'styled-components';
+import { IoIosArrowForward, IoIosClose } from 'react-icons/io';
 
 // const originalSettings = {
 //   minBookingLength: 3,
@@ -93,14 +95,60 @@ async function createBookings() {
     };
   });
 
-  console.log(finalBookings);
-
   const { error } = await supabase.from('Bookings').insert(finalBookings);
   if (error) console.log(error.message);
 }
 
+const UploadContainer = styled.div`
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: absolute;
+  padding: 1.6rem 1.2rem;
+  left: 0;
+  top: 76.5%;
+  background-color: var(--color-indigo-100);
+  border-radius: ${({ open }) => open ? '0px 5px 5px 0px' : '0px 0px 5px 0px'};
+  width: 14rem;
+  height: 12rem;
+  transform: ${({ open }) => open ? 'translateX(0)' : 'translateX(-100%)'};
+  transition: transform 0.3s ease-in-out;
+`;
+
+const UploadArea = styled.div`
+  color: var(--color-indigo-700);
+  font-size: 1.3rem;
+  line-height: 1.3;
+  text-align: center;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+`;
+
+const UploadOpener = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 2.8rem;
+  height: 2.8rem;
+  left: ${({ open }) => open ? '80%' : '100%'};
+  top: 0;
+  border-radius: 0px 5px 5px 0px;
+  cursor: pointer;
+  background-color: var(--color-indigo-100);
+  color: var(--color-indigo-700);
+
+  transition: left 0.3s ease-in-out;
+`;
+
 export function Uploader() {
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   async function uploadAll() {
     setIsLoading(true);
@@ -122,37 +170,51 @@ export function Uploader() {
     await deleteBookings();
     await createBookings();
     setIsLoading(false);
+
+    location.reload();
   }
 
   return (
-    <div
-      style={{
-        marginTop: 'auto',
-        backgroundColor: '#e0e7ff',
-        padding: '8px',
-        borderRadius: '5px',
-        textAlign: 'center',
-      }}
-    >
-      <h3>DEV AREA</h3>
-
-      <Button
-        onClick={uploadAll}
-        // To prevent accidental clicks. Remove to run once!
-        disabled={isLoading}
-        // disabled={true}
-      >
-        Upload ALL sample data
-      </Button>
-      <p>Only run this only once!</p>
-      <p>
-        <em>(Cabin images need to be uploaded manually)</em>
-      </p>
-      <hr />
-      <Button onClick={uploadBookings} disabled={isLoading}>
-        Upload CURRENT bookings
-      </Button>
-      <p>You can run this every day you develop the app</p>
-    </div>
+    <UploadContainer title='Upload current data' open={open}>
+      <UploadOpener open={open} onClick={() => setOpen(prev => !prev)}>
+        {open ? <IoIosClose size={24} color='var(--color-indigo-700)' /> : <IoIosArrowForward size={18} color='var(--color-indigo-700)' />}
+      </UploadOpener>
+      <UploadArea>
+        <p>Upload current bookings</p>
+        <Button $size='small' $variation='primary' onClick={uploadBookings} disabled={isLoading}>
+          Upload data
+        </Button>
+      </UploadArea>
+    </UploadContainer>
   );
 }
+
+{/* <div
+  style={{
+    marginTop: 'auto',
+    backgroundColor: '#e0e7ff',
+    padding: '8px',
+    borderRadius: '5px',
+    textAlign: 'center',
+  }}
+>
+  <h3>DEV AREA</h3>
+  <Button
+    onClick={uploadAll}
+    // To prevent accidental clicks. Remove to run once!
+    // disabled={isLoading}
+    disabled={true}
+  >
+    Upload ALL sample data
+  </Button>
+  <p>Only run this only once!</p>
+  <p>
+    <em>(Cabin images need to be uploaded manually)</em>
+  </p>
+  <hr />
+
+  <Button onClick={uploadBookings} disabled={isLoading}>
+    Upload CURRENT bookings
+  </Button>
+  <p>You can run this every day you develop the app</p>
+</div> */}
