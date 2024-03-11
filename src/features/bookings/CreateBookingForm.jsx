@@ -44,51 +44,54 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
   const { cabins, isLoading: isLoadingCabins } = useFetchCabins();
   // Fetch settings(breakfasr price)
   const { settings, isLoading: isLoadingSettings } = useSettings();
-
+  // Create booking
   const { createBooking, isCreatingBooking } = useCreateBooking();
 
-  // Date picker
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date(new Date().getTime() + (24 * 60 * 60 * 1000)));
+  // Most of form data
+  const [formData, setFormData] = useState({
+    startDate: new Date(),
+    endDate: new Date(new Date().getTime() + (24 * 60 * 60 * 1000)),
+    currCabin: null,
+    numGuests: null,
+    hasBreakfast: true,
+    isPaid: false,
+    status: 'unconfirmed',
+  });
+
+  const observationRef = useRef(null);
 
   // Nights number
-  const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+  const timeDiff = Math.abs(formData.endDate.getTime() - formData.startDate.getTime());
   const numNights = Math.floor(timeDiff / (1000 * 3600 * 24));
-
-  // Cabin and Guests number
-  const [currCabin, setCurrCabin] = useState(null);
-  const [numGuests, setNumGuests] = useState(null);
-
-  // Breakfast 
-  const [hasBreakfast, setHasBreakfast] = useState(true);
-
-  // Paid
-  const [isPaid, setIsPaid] = useState(false);
-
-  // Status
-  const [status, setStatus] = useState('unconfirmed');
-
-  // Additonal info
-  const observationRef = useRef(null);
 
   // Confirm form data
   const [confirmForm, setConfirmForm] = useState(false);
   // Hint for confirmation
   const [confirmHint, setConfirmHint] = useState(false);
 
-  // Set current cabin after fetched
+  // Set current cabin
   useEffect(() => {
-    if (cabins && cabins.length > 0) setCurrCabin(cabins[0]);
+    if (cabins && cabins.length > 0) {
+      setFormData(prevState => ({
+        ...prevState,
+        currCabin: cabins[0],
+      }));
+    };
   }, [cabins]);
 
-  // Set max guests capacity for current cabin
+  // Update max guest capacity
   useEffect(() => {
-    if (currCabin) setNumGuests(currCabin.maxCapacity);
-  }, [currCabin]);
+    if (formData.currCabin) {
+      setFormData(prevState => ({
+        ...prevState,
+        numGuests: formData.currCabin.maxCapacity
+      }));
+    }
+  }, [formData.currCabin]);
   
   // Capacity range for selecting possible number of guest for current cabin 
   let capacityRange;
-  if (currCabin !== null) capacityRange = [...Array(currCabin.maxCapacity).keys()].map((num) => num + 1);
+  if (formData.currCabin !== null) capacityRange = [...Array(formData.currCabin.maxCapacity).keys()].map((num) => num + 1);
 
   // FORM SUBMISSION - 2nd step - create new booking
   function onSubmitBooking() {
@@ -98,18 +101,18 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
     };
     // 1) create booking data
     const newBookingData = {
-      startDate: formatDateToString(startDate),
-      endDate: formatDateToString(endDate),
+      startDate: formatDateToString(formData.startDate),
+      endDate: formatDateToString(formData.endDate),
       numNights: +numNights,
-      numGuests: +numGuests,
-      cabinPrice: +currCabin?.regularPrice * numNights,
-      extrasPrice: +(numNights * numGuests) * settings?.breakfastPrice,
-      totalPrice: +(currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice),
-      status: String(status),
-      hasBreakfast: String(hasBreakfast).toUpperCase(),
-      isPaid: String(isPaid).toUpperCase(),
+      numGuests: +formData.numGuests,
+      cabinPrice: +formData.currCabin?.regularPrice * numNights,
+      extrasPrice: +(numNights * formData.numGuests) * settings?.breakfastPrice,
+      totalPrice: +(formData.currCabin?.regularPrice * numNights) + ((numNights * formData.numGuests) * settings?.breakfastPrice),
+      status: String(formData.status),
+      hasBreakfast: String(formData.hasBreakfast).toUpperCase(),
+      isPaid: String(formData.isPaid).toUpperCase(),
       observations: observationRef.current.value,
-      cabinId: +currCabin?.id,
+      cabinId: +formData.currCabin?.id,
       guestId: getCurrGuestId(createdGuest, guests),
     };
 
@@ -149,7 +152,10 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
               onChange={(e) => {
                 const cabinNum = e.target.value;
                 const selectedCabin = cabins.find((cabin) => cabin.name === cabinNum);
-                setCurrCabin(selectedCabin);
+                setFormData(prevState => ({
+                  ...prevState,
+                  currCabin: selectedCabin,
+                }));
               }}
             >
               {cabins.map((cabin) => (
@@ -167,8 +173,13 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         <DatePicker
           id='date-start-select'
           format='dd.MM.yyyy'
-          onChange={setStartDate}
-          value={startDate}
+          onChange={(date) => {
+            setFormData(prevState => ({
+              ...prevState,
+              startDate: date
+            }));
+          }}
+          value={formData.startDate}
         />
       </FormRow>
       <FormRow
@@ -179,8 +190,13 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         <DatePicker
           id='date-end-select'
           format='dd.MM.yyyy'
-          onChange={setEndDate}
-          value={endDate}
+          onChange={(date) => {
+            setFormData(prevState => ({
+              ...prevState,
+              endDate: date,
+            }));
+          }}
+          value={formData.endDate}
         />
       </FormRow>
 
@@ -188,18 +204,21 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         <NumberNights>{numNights}</NumberNights>
       </FormRow>
 
-      <FormRow /* id='num-guests-select' */ label='Number of guests' orientation='horizontal-selector'>
+      <FormRow label='Number of guests' orientation='horizontal-selector'>
         {isLoadingCabins
           ? <DottedLoader />
           :  <SelectForForm
               id='num-guests-select'
-              value={numGuests ?? 'Select number of guests'}
+              value={formData.numGuests ?? 'Select number of guests'}
               onChange={(e) => {
                 const selected = e.target.value;
-                setNumGuests(selected);
+                setFormData(prevState => ({
+                  ...prevState,
+                  numGuests: selected,
+                }));
               }}
             >
-              {currCabin && capacityRange.map((num) => (
+              {formData.currCabin && capacityRange.map((num) => (
                 <option value={num} name={num} key={num}>{num}</option>
               ))}
             </SelectForForm>
@@ -218,7 +237,10 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
               onChange={(e) => {
                 let selected = e.target.value;
                 selected = selected === 'yesBreakfast' ? true : false;
-                setHasBreakfast(selected);
+                setFormData(prevState => ({
+                  ...prevState,
+                  hasBreakfast: selected,
+                }));
               }}
             >
               <option value='yesBreakfast'>Yes</option>  
@@ -233,8 +255,15 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
           onChange={(e) => {
             let selected = e.target.value;
             selected = selected === 'isPaid' ? true : false;
-            setIsPaid(selected);
-            if (selected !== isPaid) setStatus('unconfirmed')
+            setFormData(prevState => ({
+              ...prevState,
+              isPaid: selected,
+            }))
+            if (selected !== formData.isPaid) 
+              setFormData(prevState => ({
+                ...prevState,
+                status: 'unconfirmed',
+              }))
           }}
         >
           <option value='notPaid'>No</option>  
@@ -244,17 +273,20 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
 
       <FormRow id='status-select' label='Booking status' orientation='horizontal-selector'>
         <SelectForForm
-          $status={status}
+          $status={formData.status}
           id='status-select'
           onChange={(e) => {
             let selected = e.target.value;
-            setStatus(selected);
+            setFormData(prevState => ({
+              ...prevState,
+              status: selected,
+            }))
           }}
         >
           <StatusOption $variation='unconfirmed' value='unconfirmed'>
             Unconfirmed
           </StatusOption>  
-          {isPaid && 
+          {formData.isPaid && 
             <>
               <StatusOption $variation='checked-in' value='checked-in'>
                 Checked-in
@@ -279,23 +311,23 @@ function CreateBookingForm({ onCloseModal, createdGuest, setCreatedGuestData }) 
         <SummaryContainer id='summary'> 
           <p>
             Cabin <SpanMedium>
-              {currCabin?.name}
+              {formData.currCabin?.name}
             </SpanMedium> price for <SpanMedium>
               {numNights}
             </SpanMedium> nights: <SpanMedium>
-              {formatCurrency(currCabin?.regularPrice * numNights)}
+              {formatCurrency(formData.currCabin?.regularPrice * numNights)}
             </SpanMedium>
           </p>
           <p>
             Breakfast price: <SpanMedium>
-              {hasBreakfast ? formatCurrency((numNights * numGuests) * settings?.breakfastPrice) : '-'}
+              {formData.hasBreakfast ? formatCurrency((numNights * formData.numGuests) * settings?.breakfastPrice) : '-'}
             </SpanMedium>
           </p>   
           <p>
             Total price: <SpanMedium>
-              {hasBreakfast 
-                ? formatCurrency((currCabin?.regularPrice * numNights) + ((numNights * numGuests) * settings?.breakfastPrice)) 
-                : formatCurrency(currCabin?.regularPrice * numNights)
+              {formData.hasBreakfast 
+                ? formatCurrency((formData.currCabin?.regularPrice * numNights) + ((numNights * formData.numGuests) * settings?.breakfastPrice)) 
+                : formatCurrency(formData.currCabin?.regularPrice * numNights)
               }
             </SpanMedium>
           </p>
