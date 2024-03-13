@@ -8,6 +8,7 @@ import { cabins } from './data-cabins';
 import { guests } from './data-guests';
 import styled from 'styled-components';
 import { IoIosArrowForward, IoIosClose } from 'react-icons/io';
+import { GoArrowDownLeft } from 'react-icons/go';
 
 // const originalSettings = {
 //   minBookingLength: 3,
@@ -105,13 +106,13 @@ const UploadContainer = styled.div`
   align-items: flex-end;
   justify-content: center;
   position: absolute;
-  padding: 1.6rem 1.2rem;
+  padding: 1.6rem 1rem;
   left: 0;
-  top: 76.5%;
+  top: 500px;
   background-color: var(--color-indigo-100);
   border-radius: ${({ open }) => open ? '0px 5px 5px 0px' : '0px 0px 5px 0px'};
   width: 14rem;
-  height: 12rem;
+  height: min-content;
   transform: ${({ open }) => open ? 'translateX(0)' : 'translateX(-100%)'};
   transition: transform 0.3s ease-in-out;
 `;
@@ -126,7 +127,7 @@ const UploadArea = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.6rem;
+  gap: 0.75rem;
 `;
 
 const UploadOpener = styled.div`
@@ -146,9 +147,44 @@ const UploadOpener = styled.div`
   transition: left 0.3s ease-in-out;
 `;
 
+const UploadHint = styled.div`
+  opacity: 85%;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  position: absolute;
+  font-size: 1.2rem;
+  font-weight: 500;
+  top: 445px;
+  left: 20px;
+  width: max-content;
+  height: max-content;
+  padding: 0.5rem;
+  border-radius: 5px;
+  color: var(--color-indigo-700);
+  
+  & div {
+    background-color: var(--color-indigo-100);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+    padding-left: 1rem;
+    border-radius: 5px;
+    gap: 0.5rem;
+  }
+`;
+
+const IconContainer = styled.span`
+  display: flex;
+  cursor: pointer;
+`;
+
 export function Uploader() {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showHint, setShowHint] = useState(true);
 
   async function uploadAll() {
     setIsLoading(true);
@@ -175,17 +211,39 @@ export function Uploader() {
   }
 
   return (
-    <UploadContainer title='Upload current data' open={open}>
-      <UploadOpener open={open} onClick={() => setOpen(prev => !prev)}>
-        {open ? <IoIosClose size={24} color='var(--color-indigo-700)' /> : <IoIosArrowForward size={18} color='var(--color-indigo-700)' />}
-      </UploadOpener>
-      <UploadArea>
-        <p>Upload current bookings</p>
-        <Button $size='small' $variation='primary' onClick={uploadBookings} disabled={isLoading}>
-          Upload data
-        </Button>
-      </UploadArea>
-    </UploadContainer>
+    <>
+      {showHint 
+        ? <UploadHint>
+            <div>
+              <span>Load current data</span>
+              <IconContainer>
+                <IoIosClose size={20} color='var(--color-indigo-700)' onClick={() => setShowHint(false)} />
+              </IconContainer>
+            </div>
+            <GoArrowDownLeft size={18} />
+          </UploadHint>
+        : ''
+      }
+      <UploadContainer title='Upload current data' open={open}>
+        <UploadOpener open={open} onClick={() => {
+          if (showHint) {
+            setShowHint(false);
+          }
+          setOpen(prev => !prev);
+        }}>
+          {open 
+            ? <IoIosClose size={24} color='var(--color-indigo-700)' /> 
+            : <IoIosArrowForward size={18} color='var (--color-indigo-700)' />
+          }
+        </UploadOpener>
+        <UploadArea>
+          <p>Load current bookings</p>
+          <Button $size='small' $variation='primary' onClick={uploadBookings} disabled={isLoading}>
+            Load data
+          </Button>
+        </UploadArea>
+      </UploadContainer>
+    </>
   );
 }
 
