@@ -148,7 +148,7 @@ const UploadOpener = styled.div`
 `;
 
 const UploadHint = styled.div`
-  opacity: 85%;
+  opacity: 80%;
   z-index: 100000;
   display: flex;
   flex-direction: column;
@@ -246,33 +246,3 @@ export function Uploader() {
     </>
   );
 }
-
-{/* <div
-  style={{
-    marginTop: 'auto',
-    backgroundColor: '#e0e7ff',
-    padding: '8px',
-    borderRadius: '5px',
-    textAlign: 'center',
-  }}
->
-  <h3>DEV AREA</h3>
-  <Button
-    onClick={uploadAll}
-    // To prevent accidental clicks. Remove to run once!
-    // disabled={isLoading}
-    disabled={true}
-  >
-    Upload ALL sample data
-  </Button>
-  <p>Only run this only once!</p>
-  <p>
-    <em>(Cabin images need to be uploaded manually)</em>
-  </p>
-  <hr />
-
-  <Button onClick={uploadBookings} disabled={isLoading}>
-    Upload CURRENT bookings
-  </Button>
-  <p>You can run this every day you develop the app</p>
-</div> */}
