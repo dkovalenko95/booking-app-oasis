@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useDarkMode } from '../context/DarkModeContext';
 
 const StyledLogo = styled.div`
   text-align: center;
@@ -9,10 +10,14 @@ const Img = styled.img`
   width: auto;
 `;
 
-function Logo() {
+function Logo({ setOpen }) {
+  const { darkMode } = useDarkMode();
+
+  const srcLogoPath = darkMode ? '/logo-dark.png' : '/logo-light.png';
+
   return (
-    <StyledLogo>
-      <Img src='/logo-light.png' alt='Logo' />
+    <StyledLogo onClick={() => setOpen(false)}>
+      <Img src={srcLogoPath} alt='Logo' />
     </StyledLogo>
   );
 }

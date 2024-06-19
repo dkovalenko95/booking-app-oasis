@@ -1,11 +1,15 @@
+import { useNavigate } from 'react-router-dom';
+import { HiArrowDownOnSquare, HiArrowUpOnSquare, HiEye } from 'react-icons/hi2';
 import styled from 'styled-components';
 import { format, isToday } from 'date-fns';
-
 import Tag from '../../ui/Tag';
 import Table from '../../ui/Table';
-
+import Menus from '../../ui/Menus';
+import Modal from '../../ui/Modal';
+import ConfirmAction from '../../ui/ConfirmAction';
 import { formatCurrency } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
+import { useCheckout } from '../check-in-out/hooks/useCheckout';
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -44,10 +48,14 @@ function BookingRow({
     numGuests,
     totalPrice,
     status,
-    guests: { fullName: guestName, email },
-    cabins: { name: cabinName },
+    Guests: { fullName: guestName, email },
+    Cabins: { name: cabinName },
   },
 }) {
+  const navigate = useNavigate();
+
+  const { checkout, isCheckingOut } = useCheckout();
+
   const statusToTagName = {
     unconfirmed: 'blue',
     'checked-in': 'green',
@@ -76,9 +84,55 @@ function BookingRow({
         </span>
       </Stacked>
 
-      <Tag type={statusToTagName[status]}>{status.replace('-', ' ')}</Tag>
+      {/* <TagContainer> */}
+        <Tag $type={statusToTagName[status]}>{status.replace('-', ' ')}</Tag>
+      {/* </TagContainer> */}
 
       <Amount>{formatCurrency(totalPrice)}</Amount>
+
+      <Modal>
+        <Menus.Menu>
+          <Menus.Toggle id={bookingId} />
+
+          <Menus.List id={bookingId}>
+            <Menus.Button
+              icon={<HiEye />}
+              onClick={() => navigate(`/bookings/${bookingId}`)}
+            >
+              See details
+            </Menus.Button>
+            
+            {status === 'unconfirmed' &&
+              <Menus.Button
+                icon={<HiArrowDownOnSquare />}
+                onClick={() => navigate(`/checkin/${bookingId}`)}
+              >
+                Check in
+              </Menus.Button>
+            }
+
+            {status === 'checked-in' &&
+              <Modal.Open opens='checkoutBooking'>
+                <Menus.Button
+                  icon={<HiArrowUpOnSquare />}
+                >
+                  Check out
+                </Menus.Button>
+              </Modal.Open> 
+            }
+          </Menus.List>
+
+          <Modal.Window name='checkoutBooking'>
+            <ConfirmAction
+              action='check out'
+              resourceName={`#${bookingId} booking`}
+              disabled={isCheckingOut}
+              onConfirm={() => checkout(bookingId)}
+            />
+          </Modal.Window>
+
+        </Menus.Menu>
+      </Modal>
     </Table.Row>
   );
 }

@@ -11,6 +11,7 @@ import DataItem from '../../ui/DataItem';
 import { Flag } from '../../ui/Flag';
 
 import { formatDistanceFromNow, formatCurrency } from '../../utils/helpers';
+import { devices } from '../../utils/devices';
 
 const StyledBookingDataBox = styled.section`
   /* Box */
@@ -30,6 +31,26 @@ const Header = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1.6rem;
+
+  @media ${devices.lg} {
+    padding: 1.5rem 3rem;
+    font-size: 1.7rem;
+  }
+
+  @media ${devices.sm} {
+    padding: 1.2rem 2.4rem;
+    font-size: 1.6rem;
+  }
+
+  @media ${devices.xs} {
+    padding: 1.2rem 1.6rem;
+  }
+
+  @media ${devices.xxs} {
+    gap: 1.2rem;
+    padding: 1.2rem;
+  }
 
   svg {
     height: 3.2rem;
@@ -42,17 +63,42 @@ const Header = styled.header`
     gap: 1.6rem;
     font-weight: 600;
     font-size: 1.8rem;
+
+    @media ${devices.sm} {
+      font-size: 1.6rem;
+      gap: 1.2rem;
+    }
   }
 
   & span {
     font-family: 'Sono';
     font-size: 2rem;
     margin-left: 4px;
+
+    @media ${devices.sm} {
+      font-size: 1.8rem;
+    }
+
+    @media ${devices.xs} {
+      font-size: 1.6rem;
+    }
   }
 `;
 
 const Section = styled.section`
   padding: 3.2rem 4rem 1.2rem;
+
+  @media ${devices.lg} {
+    padding: 2.4rem 3rem 0.8rem;
+  }
+
+  @media ${devices.sm} {
+    padding: 1.8rem 2rem 0.6rem;
+  }
+
+  @media ${devices.xs} {
+    padding: 1.2rem 1.6rem 0.6rem;
+  }
 `;
 
 const Guest = styled.div`
@@ -66,6 +112,19 @@ const Guest = styled.div`
     font-weight: 500;
     color: var(--color-grey-700);
   }
+
+  @media ${devices.lg} {
+    gap: 1.6rem;
+  }
+
+  @media ${devices.sm} {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  @media ${devices.xxs} {
+    gap: 1.2rem;
+  }
 `;
 
 const Price = styled.div`
@@ -75,11 +134,29 @@ const Price = styled.div`
   padding: 1.6rem 3.2rem;
   border-radius: var(--border-radius-sm);
   margin-top: 2.4rem;
+  gap: 1.6rem;
+
+  @media ${devices.lg} {
+    padding: 1.2rem 2.4rem;
+  }
+
+  @media ${devices.sm} {
+    padding: 1rem 1.6rem;
+  }
+
+  @media ${devices.xs} {
+    padding: 1rem 1.2rem;
+  }
+
+  @media ${devices.xxs} {
+    gap: 1.2rem;
+    margin-top: 1.8rem;
+  }
 
   background-color: ${(props) =>
-    props.isPaid ? 'var(--color-green-100)' : 'var(--color-yellow-100)'};
+    props.$isPaid ? 'var(--color-green-100)' : 'var(--color-yellow-100)'};
   color: ${(props) =>
-    props.isPaid ? 'var(--color-green-700)' : 'var(--color-yellow-700)'};
+    props.$isPaid ? 'var(--color-green-700)' : 'var(--color-yellow-700)'};
 
   & p:last-child {
     text-transform: uppercase;
@@ -115,8 +192,8 @@ function BookingDataBox({ booking }) {
     hasBreakfast,
     observations,
     isPaid,
-    guests: { fullName: guestName, email, country, countryFlag, nationalID },
-    cabins: { name: cabinName },
+    Guests: { fullName: guestName, email, country, countryFlag, nationalID },
+    Cabins: { name: cabinName },
   } = booking;
 
   return (
@@ -163,7 +240,7 @@ function BookingDataBox({ booking }) {
           {hasBreakfast ? 'Yes' : 'No'}
         </DataItem>
 
-        <Price isPaid={isPaid}>
+        <Price $isPaid={isPaid}>
           <DataItem icon={<HiOutlineCurrencyDollar />} label={`Total price`}>
             {formatCurrency(totalPrice)}
 

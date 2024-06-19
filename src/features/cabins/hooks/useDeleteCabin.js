@@ -17,7 +17,7 @@ export function useDeleteCabin() {
       }); // allow to mark queries as stale and potentially refetch data
     }, // called after successful mutation
 
-    onError: (error) => toast.error(error.message), // err from muatation func deleteCabin
+    onError: (error) => toast.error(`${error.message}. You have bookings related to this cabin, you can't delete it now.`), // err from muatation func deleteCabin
   });
 
   const isDeleting = isPending || isSuccess;

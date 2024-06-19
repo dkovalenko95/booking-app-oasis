@@ -1,17 +1,33 @@
 import styled, { css } from 'styled-components';
+import { devices } from '../utils/devices';
 
 const Row = styled.div`
   display: flex;
 
+  @media ${devices.xs} {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    align-items: center;
+    justify-content: center;
+
+    ${(props) => 
+      props.$backNav === 'back-button' &&
+      css`
+        flex-flow: column-reverse;
+      `
+    }
+  }
+
   ${(props) =>
-    props.type === 'horizontal' &&
+    props.$type === 'horizontal' &&
     css`
       justify-content: space-between;
       align-items: center;
     `}
 
   ${(props) =>
-    props.type === 'vertical' &&
+    props.$type === 'vertical' &&
     css`
       flex-direction: column;
       gap: 1.6rem;
@@ -19,7 +35,7 @@ const Row = styled.div`
 `;
 
 Row.defaultProps = {
-  type: 'vertical',
+  $type: 'vertical',
 };
 
 export default Row;

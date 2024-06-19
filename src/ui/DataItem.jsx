@@ -1,10 +1,15 @@
 import styled from 'styled-components';
+import { devices } from '../utils/devices';
 
 const StyledDataItem = styled.div`
   display: flex;
   align-items: center;
   gap: 1.6rem;
   padding: 0.8rem 0;
+
+  @media ${devices.xxs} {
+    gap: 1.2rem;
+  }
 `;
 
 const Label = styled.span`

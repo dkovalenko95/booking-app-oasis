@@ -1,10 +1,96 @@
 import { getToday } from '../utils/helpers';
 import supabase from './supabase';
+import { PAGE_CAPACITY } from '../utils/constants';
+
+export async function getGuests() {
+  const { data, error } = await supabase
+    .from('Guests')
+    .select('*')
+
+  if (error) {
+    console.error(error);
+    throw new Error('Cabins could not be loaded')
+  };
+
+  return data;
+};
+
+export async function createGuest(guestData) {
+  const { error } = await supabase
+    .from('Guests')
+    .insert({ ...guestData })
+
+  if (error) {
+    console.error(error);
+    throw new Error('Guest could not be created')
+  };
+};
+
+export async function createBooking(bookingData) {
+  const { error } = await supabase
+    .from('Bookings')
+    .insert({ ...bookingData })
+
+  if (error) {
+    console.error(error);
+    throw new Error('Booking could not be created')
+  };
+};
+
+export async function editBooking(bookingData, id) {
+  const { data, error } = await supabase
+    .from('Bookings')
+    .update({ ...bookingData })
+    .eq('id', id) // update only the row where the field of 'id' equal to 'id' passed in
+    .select()
+    .single() // return data as a single object instead of an array of objects
+
+  if (error) {
+    console.error(error);
+    throw new Error('Booking could not be edited')
+  };
+
+  return data;
+};
+
+export async function getBookings({ filter, sortBy, page }) {
+  // const { data, error } = await supabase
+  let query = supabase
+    .from('Bookings')
+    // .select('*, Cabins(*), Guests(*)');
+    .select(
+      'id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, Cabins(name), Guests(fullName, email)',
+      { count: 'exact' },
+    )
+
+  // Filter
+  // if (filter !== null) query = query[filter.method || 'eq'](filter.field, filter.value)
+  if (filter) query = query.eq(filter.field, filter.value)
+
+  // Sort
+  if (sortBy) query = query.order(sortBy.field, { ascending: sortBy.direction === 'asc', });
+
+  // Pagination
+  if (page) {
+    const from = (page - 1) * PAGE_CAPACITY;
+    const to = from + PAGE_CAPACITY - 1;
+    query = query.range(from, to);
+  };
+  
+  const { data, error, count } = await query;
+
+    if (error) {
+      console.error(error);
+      throw new Error('Bookings could not be loaded');
+    };
+
+  return { data, count };
+};
 
 export async function getBooking(id) {
   const { data, error } = await supabase
-    .from('bookings')
-    .select('*, cabins(*), guests(*)')
+    .from('Bookings')
+    .select('*, Cabins(*), Guests(*)')
     .eq('id', id)
     .single();
 
@@ -17,9 +103,10 @@ export async function getBooking(id) {
 }
 
 // Returns all BOOKINGS that are were created after the given date. Useful to get bookings created in the last 30 days, for example.
+// date: ISOString
 export async function getBookingsAfterDate(date) {
   const { data, error } = await supabase
-    .from('bookings')
+    .from('Bookings')
     .select('created_at, totalPrice, extrasPrice')
     .gte('created_at', date)
     .lte('created_at', getToday({ end: true }));
@@ -35,9 +122,9 @@ export async function getBookingsAfterDate(date) {
 // Returns all STAYS that are were created after the given date
 export async function getStaysAfterDate(date) {
   const { data, error } = await supabase
-    .from('bookings')
+    .from('Bookings')
     // .select('*')
-    .select('*, guests(fullName)')
+    .select('*, Guests(fullName)')
     .gte('startDate', date)
     .lte('startDate', getToday());
 
@@ -52,8 +139,8 @@ export async function getStaysAfterDate(date) {
 // Activity means that there is a check in or a check out today
 export async function getStaysTodayActivity() {
   const { data, error } = await supabase
-    .from('bookings')
-    .select('*, guests(fullName, nationality, countryFlag)')
+    .from('Bookings')
+    .select('*, Guests(fullName, nationality, countryFlag)')
     .or(
       `and(status.eq.unconfirmed,startDate.eq.${getToday()}),and(status.eq.checked-in,endDate.eq.${getToday()})`
     )
@@ -72,7 +159,7 @@ export async function getStaysTodayActivity() {
 
 export async function updateBooking(id, obj) {
   const { data, error } = await supabase
-    .from('bookings')
+    .from('Bookings')
     .update(obj)
     .eq('id', id)
     .select()
@@ -87,7 +174,10 @@ export async function updateBooking(id, obj) {
 
 export async function deleteBooking(id) {
   // REMEMBER RLS POLICIES
-  const { data, error } = await supabase.from('bookings').delete().eq('id', id);
+  const { data, error } = await supabase
+    .from('Bookings')
+    .delete()
+    .eq('id', id);
 
   if (error) {
     console.error(error);

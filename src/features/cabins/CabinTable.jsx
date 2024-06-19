@@ -1,35 +1,61 @@
+import { useSearchParams } from 'react-router-dom';
 import Menus from '../../ui/Menus';
 import Spinner from '../../ui/Spinner';
 import Table from '../../ui/Table';
+import Empty from '../../ui/Empty';
 import CabinRow from './CabinRow';
 import { useFetchCabins } from './hooks/useFetchCabins';
 
 function CabinTable() {
   const { isLoading, cabins } = useFetchCabins();
+  const [searchParams] = useSearchParams();
 
   if (isLoading) return <Spinner />
+
+  if (!cabins.length) return <Empty resource='cabins' />
+
+  // Filter
+  const filterValue = searchParams.get('discount') || 'all';
+  let filteredCabins;
+  if (filterValue === 'all') filteredCabins = cabins
+  if (filterValue === 'no-discount') filteredCabins = cabins.filter((c) => c.discount === 0);
+  if (filterValue === 'with-discount') filteredCabins = cabins.filter((c) => c.discount > 0);
+
+  // Sort
+  const sortBy = searchParams.get('sortBy') || 'created_at-asc';
+  const [field, direction] = sortBy.split('-');
+  const modifier = direction === 'asc' ? 1 : -1;
+  
+  let sortedCabins = filteredCabins;
+  if (field === 'name') sortedCabins = filteredCabins?.sort((a, b) => a.name.localeCompare(b.name) * modifier);
+  if (field === 'created_at') filteredCabins?.sort((a, b) => (Number(new Date(a.created_at)) - Number(new Date(b.created_at))) * modifier);
+  else filteredCabins?.sort((a, b) => (a[field] - b[field]) * modifier);
 
   return (
     // Compound Component Pattern
     <Menus>
-      <Table columns='0.6fr 1.8fr 2.2fr 1fr 1fr 1fr'>
-        <Table.Header>
-          <div></div>
-          <div>Cabin</div>
-          <div>Capacity</div>
-          <div>Price</div>
-          <div>Discount</div>
-          <div></div>
-        </Table.Header>
+      <div style={{ overflowX: 'auto' }}>
+        <Table columns='0.6fr 1.8fr 2.2fr 1fr 1fr 1fr'>
+          <Table.Header>
+            <div></div>
+            <div>Cabin</div>
+            <div>Capacity</div>
+            <div>Price</div>
+            <div>Discount</div>
+            <div></div>
+          </Table.Header>
 
-        {/* Render Props Pattern */}
-        <Table.Body
-          data={cabins}
-          render={(cabin) => (
-            <CabinRow cabin={cabin} key={cabin.id} />
-            )}
-        />
-      </Table>
+          {/* Render Props Pattern */}
+          <Table.Body
+            // data={cabins}
+            // data={filteredCabins}
+            data={sortedCabins}
+            render={(cabin) => (
+              <CabinRow cabin={cabin} key={cabin.id} />
+              )}
+          />
+        </Table>
+      </div>
     </Menus>
   );
 }

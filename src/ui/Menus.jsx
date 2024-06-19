@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { HiEllipsisVertical } from 'react-icons/hi2';
+import { IoCloseOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 import { useOutsideClick } from '../hooks/useOutsideClick';
 
@@ -100,6 +101,8 @@ function Toggle({ id }) {
   }, [openId, close]);
 
   const clickHandler = (e) => {
+    e.stopPropagation();
+
     const rect = e.target
       .closest('button')
       .getBoundingClientRect();
@@ -114,14 +117,14 @@ function Toggle({ id }) {
 
   return (
     <StyledToggle onClick={clickHandler}>
-      <HiEllipsisVertical />
+      {openId === id ? <IoCloseOutline /> : <HiEllipsisVertical />}
     </StyledToggle>
   );
 }
 
 function List({ id, children }) {
   const { openId, position, close } = useContext(MenusContext);
-  const { ref } = useOutsideClick(close);
+  const { ref } = useOutsideClick(close, false);
 
   if (openId !== id) return null;
 

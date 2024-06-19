@@ -1,4 +1,8 @@
 import styled from 'styled-components';
+import Heading from '../../ui/Heading';
+import { PieChart, ResponsiveContainer, Pie, Cell, Legend, Tooltip } from 'recharts';
+import { useDarkMode } from '../../context/DarkModeContext';
+import { devices } from '../../utils/devices';
 
 const ChartBox = styled.div`
   /* Box */
@@ -15,6 +19,29 @@ const ChartBox = styled.div`
 
   & .recharts-pie-label-text {
     font-weight: 600;
+  }
+
+  @media ${devices.xxl} {
+    padding: 1.8rem 2.4rem;
+  }
+
+  @media ${devices.xl} {
+    padding: 1.8rem 4.8rem;
+    grid-column: 1 / span 3; 
+  }
+
+  @media ${devices.lg} {
+    padding: 1.8rem 3.2rem;
+    grid-column: 1 / -1; 
+  }
+
+  @media ${devices.sm} {
+    padding: 1.2rem 2.4rem;
+    grid-column: 1 / -1; 
+  }
+
+  @media ${devices.xs} {
+    padding: 1rem 1.2rem;
   }
 `;
 
@@ -130,3 +157,49 @@ function prepareData(startData, stays) {
 
   return data;
 }
+
+function DurationChart({ confirmedStays }) {
+  const { darkMode } = useDarkMode();
+
+  const startData = darkMode ? startDataDark : startDataLight;
+
+  const data = prepareData(startData, confirmedStays);
+
+  return (
+    <ChartBox>
+      <Heading as='h2'>Stay duration summary</Heading>
+      <ResponsiveContainer width='100%' height={240}>
+        <PieChart>
+          <Pie
+            data={data}
+            nameKey='duration'
+            dataKey='value'
+            innerRadius={'65%'}
+            outerRadius={'90%'}
+            cx='45%'
+            cy='50%'
+            paddingAngle={3}
+          >
+            {data.map((entry) => (
+              <Cell
+                fill={entry.color}
+                stroke={entry.color}
+                key={entry.duration}
+              />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend
+            verticalAlign='middle'
+            align='right'
+            layout='vertical'
+            iconSize={16}
+            iconType='circle'
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </ChartBox>
+  );
+}
+
+export default DurationChart;

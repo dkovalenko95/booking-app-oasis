@@ -13,8 +13,12 @@ const StyledModal = styled.div`
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 3.2rem 4rem;
+  /* padding: 3.2rem 4rem; */
+  padding: 3.2rem 3.6rem;
   transition: all 0.5s;
+  
+  max-height: 87.5%;
+  overflow-y: auto;
 `;
 
 const Overlay = styled.div`
@@ -37,8 +41,10 @@ const Button = styled.button`
   transform: translateX(0.8rem);
   transition: all 0.2s;
   position: absolute;
-  top: 1.2rem;
-  right: 1.9rem;
+  /* top: 1.2rem; */
+  /* right: 1.9rem; */
+  top: 0.8rem;
+  right: 1.8rem;
 
   &:hover {
     background-color: var(--color-grey-100);

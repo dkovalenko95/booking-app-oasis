@@ -4,29 +4,33 @@ import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
 
-import { useUpdateUser } from './useUpdateUser';
+import { useUpdateUser } from './hooks/useUpdateUser';
 
 function UpdatePasswordForm() {
   const { register, handleSubmit, formState, getValues, reset } = useForm();
   const { errors } = formState;
 
-  const { updateUser, isUpdating } = useUpdateUser();
+  const { updateCurrentUser, isUpdatingCurrUser } = useUpdateUser();
 
   function onSubmit({ password }) {
-    updateUser({ password }, { onSuccess: reset });
-  }
+    updateCurrentUser({ password }, {
+      onSuccess: () => reset(),
+    });
+  };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormRow
-        label='Password (min 8 characters)'
+        label='New password'
         error={errors?.password?.message}
+        hint='min 8 chars'
+        orientation='vertical'
       >
         <Input
           type='password'
           id='password'
           autoComplete='current-password'
-          disabled={isUpdating}
+          disabled={isUpdatingCurrUser}
           {...register('password', {
             required: 'This field is required',
             minLength: {
@@ -40,12 +44,13 @@ function UpdatePasswordForm() {
       <FormRow
         label='Confirm password'
         error={errors?.passwordConfirm?.message}
+        orientation='vertical'
       >
         <Input
           type='password'
           autoComplete='new-password'
           id='passwordConfirm'
-          disabled={isUpdating}
+          disabled={isUpdatingCurrUser}
           {...register('passwordConfirm', {
             required: 'This field is required',
             validate: (value) =>
@@ -54,10 +59,14 @@ function UpdatePasswordForm() {
         />
       </FormRow>
       <FormRow>
-        <Button onClick={reset} type='reset' variation='secondary'>
+        <Button
+          onClick={reset}
+          type='reset'
+          $variation='secondary'
+        >
           Cancel
         </Button>
-        <Button disabled={isUpdating}>Update password</Button>
+        <Button disabled={isUpdatingCurrUser}>Update password</Button>
       </FormRow>
     </Form>
   );
